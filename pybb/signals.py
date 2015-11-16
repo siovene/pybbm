@@ -48,7 +48,7 @@ def user_saved(instance, created, **kwargs):
     instance.user_permissions.add(add_post_permission, add_topic_permission)
     instance.save()
 
-    if defaults.PYBB_PROFILE_RELATED_NAME:
+    if defaults.PYBB_PROFILE_RELATED_NAME and getattr(instance, defaults.PYBB_PROFILE_RELATED_NAME) is None:
         ModelProfile = util.get_pybb_profile_model()
         profile = ModelProfile()
         setattr(instance, defaults.PYBB_PROFILE_RELATED_NAME, profile)
