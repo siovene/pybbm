@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-09 16:27+0300\n"
+"POT-Creation-Date: 2015-11-19 19:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Pavel Zhukov <gelios@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -194,7 +194,7 @@ msgid "Topic"
 msgstr "Тема"
 
 #: models.py:163 templates/pybb/forum_list.html:11
-#: templates/pybb/user_topics.html:9
+#: templates/pybb/user_topics.html:8
 msgid "Topics"
 msgstr "Темы"
 
@@ -216,7 +216,7 @@ msgstr "Сообщение"
 
 #: models.py:265 templates/pybb/forum_list.html:14
 #: templates/pybb/topic.html:28 templates/pybb/topic.html.py:48
-#: templates/pybb/topic_list.html:10 templates/pybb/user_posts.html:9
+#: templates/pybb/topic_list.html:10 templates/pybb/user_posts.html:8
 msgid "Posts"
 msgstr "Сообщения"
 
@@ -318,6 +318,42 @@ msgstr "Автоматически подписывать"
 #: profiles.py:44
 msgid "Automatically subscribe to topics that you answer"
 msgstr "Автоматически подписывать на темы, на которые вы ответили"
+
+#: util.py:140
+msgid "Can't get profile for anonymous user"
+msgstr "Невозможно получить профиль для анонимного пользователя"
+
+#: views.py:144
+msgid "Forum does not exist"
+msgstr "Форум не найден"
+
+#: views.py:314
+msgid "This topic does not exists"
+msgstr "Тема не найдена"
+
+#: views.py:747
+msgid ""
+"Subscription removed. You will not receive emails from this topic unless you "
+"subscribe or post again."
+msgstr ""
+
+#: views.py:758
+msgid ""
+"Subscription added. You will receive email notifications for replies to this "
+"topic."
+msgstr ""
+
+#: views.py:776
+msgid "All forums marked as read"
+msgstr "Все форумы отмечены как прочтенные"
+
+#: views.py:809
+msgid "User successfuly blocked"
+msgstr "Пользователь успешно заблокирован"
+
+#: views.py:822
+msgid "User successfuly unblocked"
+msgstr "Пользователь успешно разблокирован"
 
 #: templates/pybb/_button_new_topic.html:2 templates/pybb/add_post.html:5
 #: templates/pybb/add_post.html.py:32
@@ -494,6 +530,154 @@ msgstr "Отметить все форумы как прочтенные"
 msgid "Mark all topics as read"
 msgstr "Отметить все темы как прочтенные"
 
+#: templates/pybb/pagination.html:7
+msgid "previous page"
+msgstr "предыдущая страница"
+
+#: templates/pybb/pagination.html:21
+msgid "next page"
+msgstr "следующая страница"
+
+#: templates/pybb/poll.html:5
+msgid "Poll"
+msgstr "Опрос"
+
+#: templates/pybb/poll.html:37
+msgid "Cancel my poll vote"
+msgstr "Отменить мой выбор"
+
+#: templates/pybb/poll_edit_form.html:7
+msgid "Poll answers"
+msgstr "Ответы на опрос"
+
+#: templates/pybb/poll_edit_form.html:20
+msgid "remove answer"
+msgstr "удалить ответ"
+
+#: templates/pybb/poll_edit_form.html:21
+msgid "add answer"
+msgstr "добавить ответ"
+
+#: templates/pybb/post_template.html:29
+msgid "Rank"
+msgstr "Ранг"
+
+#: templates/pybb/post_template.html:42 templates/pybb/user.html:49
+msgid "Edit"
+msgstr "Редактировать"
+
+#: templates/pybb/post_template.html:46
+msgid "Delete post?"
+msgstr "Удалить сообщение?"
+
+#: templates/pybb/post_template.html:47
+msgid "Delete"
+msgstr "Удалить"
+
+#: templates/pybb/post_template.html:49
+msgid "Approve post"
+msgstr "Принять пост"
+
+#: templates/pybb/post_template.html:54 templates/pybb/topic.html:68
+msgid "Admin"
+msgstr "Админка"
+
+#: templates/pybb/post_template.html:70
+msgid "Edited"
+msgstr "Отредактировано"
+
+#: templates/pybb/post_template.html:84
+msgid "quote"
+msgstr "цитировать"
+
+#: templates/pybb/post_template.html:85
+msgid "quote selected"
+msgstr "цитировать выделенное"
+
+#: templates/pybb/topic.html:57
+msgid "Unstick topic"
+msgstr "Снять закрепление"
+
+#: templates/pybb/topic.html:59
+msgid "Stick topic"
+msgstr "Закрепить тему"
+
+#: templates/pybb/topic.html:63
+msgid "Open topic"
+msgstr "Открыть тему"
+
+#: templates/pybb/topic.html:65
+msgid "Close topic"
+msgstr "Закрыть тему"
+
+#: templates/pybb/topic.html:76
+msgid "Unsubscribe"
+msgstr "Запретить уведомления"
+
+#: templates/pybb/topic.html:78
+msgid "Subscribe"
+msgstr "Получать уведомления"
+
+#: templates/pybb/topic_list.html:13
+msgid "Views"
+msgstr "Просмотров"
+
+#: templates/pybb/topic_list.html:16
+msgid "Last post"
+msgstr "Последнее сообщение"
+
+#: templates/pybb/topic_list.html:26
+msgid "Go to first unread post"
+msgstr "Перейти к первому непрочитанному сообщению"
+
+#: templates/pybb/topic_list.html:32
+msgid "pages"
+msgstr "страницы"
+
+#: templates/pybb/user.html:18
+msgid "Statistics"
+msgstr "Статистика"
+
+#: templates/pybb/user.html:21
+msgid "Number of topics"
+msgstr "Количество тем"
+
+#: templates/pybb/user.html:27
+msgid "Number of posts"
+msgstr "Количество сообщений"
+
+#: templates/pybb/user.html:31
+msgid "Date of registration"
+msgstr "Дата регистрации"
+
+#: templates/pybb/user.html:39
+msgid "Block"
+msgstr "Заблокировать"
+
+#: templates/pybb/user.html:40
+msgid "Block and delete all messages"
+msgstr "Заблокировать и удалить сообщения"
+
+#: templates/pybb/user.html:44
+msgid "Unblock"
+msgstr "Разблокировать"
+
+#: templates/pybb/user_posts.html:13 templates/pybb/user_posts.html.py:18
+msgid "All posts created by"
+msgstr "Сообщения, оставленные пользователем"
+
+#: templates/pybb/user_topics.html:13 templates/pybb/user_topics.html.py:18
+msgid "All topics created by"
+msgstr "Темы, созданные пользователем"
+
+#: templates/pybb/users.html:8 templates/pybb/users.html.py:24
+msgid "Users"
+msgstr "Пользователи"
+
+#: templates/pybb/users.html:12
+msgid "Search"
+msgstr "Поиск"
+
 #: templates/pybb/mail_templates/subscription_email_body.html:4
 msgid "replied in topic to which you are subscribed."
 msgstr "ответил в теме, на которую вы подписаны"
@@ -568,154 +752,6 @@ msgstr "Нумерованный список"
 msgid "Code Block / Code"
 msgstr "Программный код"
 
-#: templates/pybb/pagination.html:7
-msgid "previous page"
-msgstr "предыдущая страница"
-
-#: templates/pybb/pagination.html:21
-msgid "next page"
-msgstr "следующая страница"
-
-#: templates/pybb/poll.html:5
-msgid "Poll"
-msgstr "Опрос"
-
-#: templates/pybb/poll.html:37
-msgid "Cancel my poll vote"
-msgstr "Отменить мой выбор"
-
-#: templates/pybb/poll_edit_form.html:7
-msgid "Poll answers"
-msgstr "Ответы на опрос"
-
-#: templates/pybb/poll_edit_form.html:20
-msgid "remove answer"
-msgstr "удалить ответ"
-
-#: templates/pybb/poll_edit_form.html:21
-msgid "add answer"
-msgstr "добавить ответ"
-
-#: templates/pybb/post_template.html:29
-msgid "Rank"
-msgstr "Ранг"
-
-#: templates/pybb/post_template.html:42 templates/pybb/user.html:47
-msgid "Edit"
-msgstr "Редактировать"
-
-#: templates/pybb/post_template.html:46
-msgid "Delete post?"
-msgstr "Удалить сообщение?"
-
-#: templates/pybb/post_template.html:47
-msgid "Delete"
-msgstr "Удалить"
-
-#: templates/pybb/post_template.html:49
-msgid "Approve post"
-msgstr "Принять пост"
-
-#: templates/pybb/post_template.html:54 templates/pybb/topic.html:68
-msgid "Admin"
-msgstr "Админка"
-
-#: templates/pybb/post_template.html:70
-msgid "Edited"
-msgstr "Отредактировано"
-
-#: templates/pybb/post_template.html:84
-msgid "quote"
-msgstr "цитировать"
-
-#: templates/pybb/post_template.html:85
-msgid "quote selected"
-msgstr "цитировать выделенное"
-
-#: templates/pybb/topic.html:57
-msgid "Unstick topic"
-msgstr "Снять закрепление"
-
-#: templates/pybb/topic.html:59
-msgid "Stick topic"
-msgstr "Закрепить тему"
-
-#: templates/pybb/topic.html:63
-msgid "Open topic"
-msgstr "Открыть тему"
-
-#: templates/pybb/topic.html:65
-msgid "Close topic"
-msgstr "Закрыть тему"
-
-#: templates/pybb/topic.html:76
-msgid "Unsubscribe"
-msgstr "Запретить уведомления"
-
-#: templates/pybb/topic.html:78
-msgid "Subscribe"
-msgstr "Получать уведомления"
-
-#: templates/pybb/topic_list.html:13
-msgid "Views"
-msgstr "Просмотров"
-
-#: templates/pybb/topic_list.html:16
-msgid "Last post"
-msgstr "Последнее сообщение"
-
-#: templates/pybb/topic_list.html:26
-msgid "Go to first unread post"
-msgstr "Перейти к первому непрочитанному сообщению"
-
-#: templates/pybb/topic_list.html:32
-msgid "pages"
-msgstr "страницы"
-
-#: templates/pybb/user.html:16
-msgid "Statistics"
-msgstr "Статистика"
-
-#: templates/pybb/user.html:19
-msgid "Number of topics"
-msgstr "Количество тем"
-
-#: templates/pybb/user.html:25
-msgid "Number of posts"
-msgstr "Количество сообщений"
-
-#: templates/pybb/user.html:29
-msgid "Date of registration"
-msgstr "Дата регистрации"
-
-#: templates/pybb/user.html:37
-msgid "Block"
-msgstr "Заблокировать"
-
-#: templates/pybb/user.html:38
-msgid "Block and delete all messages"
-msgstr "Заблокировать и удалить сообщения"
-
-#: templates/pybb/user.html:42
-msgid "Unblock"
-msgstr "Разблокировать"
-
-#: templates/pybb/user_posts.html:12 templates/pybb/user_posts.html.py:16
-msgid "All posts created by"
-msgstr "Сообщения, оставленные пользователем"
-
-#: templates/pybb/user_topics.html:12 templates/pybb/user_topics.html.py:16
-msgid "All topics created by"
-msgstr "Темы, созданные пользователем"
-
-#: templates/pybb/users.html:8 templates/pybb/users.html.py:24
-msgid "Users"
-msgstr "Пользователи"
-
-#: templates/pybb/users.html:12
-msgid "Search"
-msgstr "Поиск"
-
 #: templatetags/pybb_tags.py:60
 msgid "seconds ago,seconds ago,seconds ago"
 msgstr "секунду назад,секунды назад,секунд назад"
@@ -741,27 +777,3 @@ msgstr "сегодня, %s"
 #, python-format
 msgid "yesterday, %s"
 msgstr "вчера, %s"
-
-#: util.py:140
-msgid "Can't get profile for anonymous user"
-msgstr "Невозможно получить профиль для анонимного пользователя"
-
-#: views.py:144
-msgid "Forum does not exist"
-msgstr "Форум не найден"
-
-#: views.py:314
-msgid "This topic does not exists"
-msgstr "Тема не найдена"
-
-#: views.py:772
-msgid "All forums marked as read"
-msgstr "Все форумы отмечены как прочтенные"
-
-#: views.py:805
-msgid "User successfuly blocked"
-msgstr "Пользователь успешно заблокирован"
-
-#: views.py:818
-msgid "User successfuly unblocked"
-msgstr "Пользователь успешно разблокирован"

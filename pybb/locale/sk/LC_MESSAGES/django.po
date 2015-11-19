@@ -7,10 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybb\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-29 21:12+0600\n"
+"POT-Creation-Date: 2015-11-19 19:03+0000\n"
 "PO-Revision-Date: 2009-10-26 14:09+0100\n"
 "Last-Translator: Tomas Drencak <tomas@drencak.com>\n"
 "Language-Team: tomas <tomas@drencak.com>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,57 +19,113 @@ msgstr ""
 "X-Poedit-Language: Slovak\n"
 "X-Poedit-Country: SLOVAKIA\n"
 
-#: admin.py:23 admin.py:42 admin.py:61 admin.py:88
+#: admin.py:43 admin.py:70 admin.py:98 admin.py:120
 msgid "Additional options"
 msgstr "Ďalšie možnosti"
 
-#: admin.py:66 models.py:193
+#: admin.py:103 models.py:241
 msgid "Message"
 msgstr "Správa"
 
-#: admin.py:83
-msgid "IM"
-msgstr "IM"
+#: admin.py:134
+#, fuzzy
+msgid "View post"
+msgstr "Videné"
 
-#: admin.py:93
-msgid "Ban options"
-msgstr "Nastevanie blokovania"
+#: admin.py:139
+#, fuzzy
+msgid "Edit post"
+msgstr "Editácia príspevku"
 
-#: feeds.py:21 feeds.py:22 templates/pybb/base.html:13
+#: apps.py:9
+msgid "Pybbm forum solution"
+msgstr ""
+
+#: feeds.py:27 feeds.py:28 templates/pybb/base.html:12
 msgid "Latest posts on forum"
 msgstr "Najnovšie príspevky na fóre"
 
-#: feeds.py:31 feeds.py:32 templates/pybb/base.html:14
+#: feeds.py:41 feeds.py:42 templates/pybb/base.html:13
 msgid "Latest topics on forum"
 msgstr "Najnovšie témy na fóre"
 
-#: forms.py:14 forms.py:112 models.py:108
-msgid "Subject"
-msgstr "Predmet"
-
-#: forms.py:15 templates/pybb/post_template.html:61
-msgid "Attachment"
-msgstr "Príloha"
-
-#: forms.py:42
+#: forms.py:28
 msgid "Attachment is too big"
 msgstr "Príloha je príliš veľká"
 
-#: models.py:39 models.py:67 models.py:327
+#: forms.py:46
+#, python-format
+msgid "You cant add more than %s answers for poll"
+msgstr ""
+
+#: forms.py:48
+msgid "Add two or more answers for this poll"
+msgstr ""
+
+#: forms.py:56 models.py:144
+msgid "Subject"
+msgstr "Predmet"
+
+#: forms.py:57 models.py:156
+msgid "Poll type"
+msgstr ""
+
+#: forms.py:59 models.py:157
+#, fuzzy
+msgid "Poll question"
+msgstr "Pozícia"
+
+#: forms.py:62
+#, fuzzy
+msgid "Topic slug"
+msgstr "Témy"
+
+#: forms.py:121
+msgid "Polls question is required when adding a poll"
+msgstr ""
+
+#: forms.py:174 models.py:147 models.py:256 models.py:329 models.py:468
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+msgid "User"
+msgstr "Používateľ"
+
+#: forms.py:210
+#, python-format
+msgid "Avatar is too large, max size: %s bytes"
+msgstr ""
+
+#: models.py:31 models.py:67
 msgid "Name"
 msgstr "Názov"
 
-#: models.py:40 models.py:68
+#: models.py:32 models.py:68
 msgid "Position"
 msgstr "Pozícia"
 
-#: models.py:44 models.py:66
+#: models.py:33 models.py:74 templates/pybb/category.html:5
+#: templates/pybb/forum_list.html:26
+msgid "Hidden"
+msgstr ""
+
+#: models.py:34
+msgid "If checked, this category will be visible only for staff"
+msgstr ""
+
+#: models.py:35 models.py:77 models.py:158
+msgid "Slug"
+msgstr ""
+
+#: models.py:39 models.py:64
 msgid "Category"
 msgstr "Kategória"
 
-#: models.py:45
+#: models.py:40
 msgid "Categories"
 msgstr "Kategórie"
+
+#: models.py:65
+msgid "Parent forum"
+msgstr ""
 
 #: models.py:69
 msgid "Description"
@@ -78,493 +135,831 @@ msgstr "Popis"
 msgid "Moderators"
 msgstr "Moderátori"
 
-#: models.py:71 models.py:110 models.py:191
+#: models.py:71 models.py:146 models.py:258
 msgid "Updated"
 msgstr "Aktualizované"
 
-#: models.py:72 models.py:116
+#: models.py:72 models.py:153 profiles.py:40
 msgid "Post count"
 msgstr "Počet príspevkov"
 
-#: models.py:76 models.py:107
+#: models.py:73
+#, fuzzy
+msgid "Topic count"
+msgstr "Počet príspevkov"
+
+#: models.py:76
+msgid "Headline"
+msgstr ""
+
+#: models.py:81 models.py:143 templates/pybb/forum_list.html:8
 msgid "Forum"
 msgstr "Fórum"
 
-#: models.py:77
+#: models.py:82
 msgid "Forums"
 msgstr "Fóra"
 
-#: models.py:109 models.py:190
+#: models.py:138
+msgid "None"
+msgstr "Žiadne"
+
+#: models.py:139
+msgid "Single answer"
+msgstr ""
+
+#: models.py:140
+msgid "Multiple answers"
+msgstr ""
+
+#: models.py:145 models.py:257
 msgid "Created"
 msgstr "Vytvorené"
 
-#: models.py:111 models.py:189 models.py:251 models.py:303
-msgid "User"
-msgstr "Používateľ"
-
-#: models.py:112
+#: models.py:148
 msgid "Views count"
 msgstr "Videné"
 
-#: models.py:113
+#: models.py:149 templates/pybb/topic_list.html:27
 msgid "Sticky"
 msgstr "Sledovaná"
 
-#: models.py:114 templates/pybb/forum.html:24
+#: models.py:150 templates/pybb/topic_list.html:28
 msgid "Closed"
 msgstr "Zatvorené"
 
-#: models.py:115
+#: models.py:152 templates/pybb/topic.html:94
 msgid "Subscribers"
 msgstr "Odoberatelia"
 
-#: models.py:120 models.py:188 models.py:304
+#: models.py:155 models.py:260
+#, fuzzy
+msgid "On moderation"
+msgstr "Moderátori"
+
+#: models.py:162 models.py:255 models.py:444 templates/pybb/topic_list.html:7
 msgid "Topic"
 msgstr "Téma"
 
-#: models.py:121 templates/pybb/forum.html:36
-#: templates/pybb/quick_access.html:47 templates/pybb/user_posts.html:19
-#: templates/pybb/user_topics.html:25
+#: models.py:163 templates/pybb/forum_list.html:11
+#: templates/pybb/user_topics.html:8
 msgid "Topics"
 msgstr "Témy"
 
-#: models.py:192
-msgid "Markup"
-msgstr "Formátovaný text"
-
-#: models.py:194
+#: models.py:242
 msgid "HTML version"
 msgstr "HTML verzia"
 
-#: models.py:195
+#: models.py:243
 msgid "Text version"
 msgstr "Textová verzia"
 
-#: models.py:196
+#: models.py:259
 msgid "User IP"
 msgstr "IP používateľa"
 
-#: models.py:201 models.py:323
+#: models.py:264 models.py:347
 msgid "Post"
 msgstr "Príspevok"
 
-#: models.py:202 templates/pybb/quick_access.html:50
-#: templates/pybb/topic.html:29 templates/pybb/topic.html.py:42
+#: models.py:265 templates/pybb/forum_list.html:14
+#: templates/pybb/topic.html:28 templates/pybb/topic.html.py:48
+#: templates/pybb/topic_list.html:10 templates/pybb/user_posts.html:8
 msgid "Posts"
 msgstr "Príspevky"
 
-#: models.py:246
-msgid "No"
-msgstr "Nie"
+#: models.py:332
+msgid "Profile"
+msgstr "Profil"
 
-#: models.py:247
-msgid "Caution"
-msgstr "Upozornenie"
+#: models.py:333
+msgid "Profiles"
+msgstr "Profily"
 
-#: models.py:248
-msgid "Ban"
-msgstr "Blokovanie"
+#: models.py:344
+msgid "Attachment"
+msgstr "Príloha"
 
-#: models.py:252 templates/pybb/user.html:46
-msgid "Site"
-msgstr "Stránka"
+#: models.py:345
+#, fuzzy
+msgid "Attachments"
+msgstr "Príloha"
 
-#: models.py:253
-msgid "Jabber"
-msgstr "Jabber"
+#: models.py:348
+msgid "Size"
+msgstr "Veľkosť"
 
-#: models.py:254
-msgid "ICQ"
-msgstr "ICQ"
+#: models.py:349
+msgid "File"
+msgstr ""
 
-#: models.py:255
-msgid "MSN"
-msgstr "MSN"
+#: models.py:399
+msgid "Topic read tracker"
+msgstr ""
 
-#: models.py:256
-msgid "AIM"
-msgstr "AIM"
+#: models.py:400
+msgid "Topic read trackers"
+msgstr ""
 
-#: models.py:257
-msgid "Yahoo"
-msgstr "Yahoo"
+#: models.py:437
+msgid "Forum read tracker"
+msgstr ""
 
-#: models.py:258 templates/pybb/user.html:43
-msgid "Location"
-msgstr "Umiestnenie"
+#: models.py:438
+msgid "Forum read trackers"
+msgstr ""
 
-#: models.py:259
+#: models.py:445
+msgid "Text"
+msgstr ""
+
+#: models.py:448 models.py:467
+msgid "Poll answer"
+msgstr ""
+
+#: models.py:449
+msgid "Polls answers"
+msgstr ""
+
+#: models.py:472
+msgid "Poll answer user"
+msgstr ""
+
+#: models.py:473
+msgid "Polls answers users"
+msgstr ""
+
+#: models.py:496
+#, python-format
+msgid ""
+"After %(limit)s attemps, there is not any unique slug value for \"%(slug)s\""
+msgstr ""
+
+#: profiles.py:33
 msgid "Signature"
 msgstr "Podpis"
 
-#: models.py:260
+#: profiles.py:34
 #, fuzzy
 msgid "Signature HTML Version"
 msgstr "HTML версия"
 
-#: models.py:261
+#: profiles.py:36
 msgid "Time zone"
 msgstr "Časová zóna"
 
-#: models.py:262
+#: profiles.py:37
 msgid "Language"
 msgstr "Jazyk"
 
-#: models.py:264
-msgid "Avatar"
-msgstr "Avatar"
-
-#: models.py:265
+#: profiles.py:39
 msgid "Show signatures"
 msgstr "Zobraziť podpisy"
 
-#: models.py:266
-msgid "Default markup"
-msgstr "Východzí markup jazyk"
+#: profiles.py:41
+msgid "Avatar"
+msgstr "Avatar"
 
-#: models.py:267
-msgid "Ban status"
-msgstr "Status blokovania"
-
-#: models.py:268
-msgid "Ban till"
-msgstr "Blokovaný do"
-
-#: models.py:271
-msgid "Profile"
-msgstr "Profil"
-
-#: models.py:272
-msgid "Profiles"
-msgstr "Profily"
-
-#: models.py:305
-msgid "Time"
-msgstr "Čas"
-
-#: models.py:309
-msgid "Read"
-msgstr "Prečítané"
-
-#: models.py:310
-msgid "Reads"
-msgstr "Prečítania"
-
-#: models.py:324
-msgid "Size"
-msgstr "Veľkosť"
-
-#: models.py:325
-msgid "Content type"
+#: profiles.py:43
+msgid "Automatically subscribe"
 msgstr ""
 
-#: models.py:326
-msgid "Path"
-msgstr "Cesta"
+#: profiles.py:44
+msgid "Automatically subscribe to topics that you answer"
+msgstr ""
 
-#: models.py:328
-msgid "Hash"
-msgstr "Hash"
+#: util.py:140
+msgid "Can't get profile for anonymous user"
+msgstr ""
 
-#: subscription.py:11
-#, python-format
+#: views.py:144
+#, fuzzy
+msgid "Forum does not exist"
+msgstr "Používateľ s loginom %s neexistuje"
+
+#: views.py:314
+#, fuzzy
+msgid "This topic does not exists"
+msgstr "Používateľ s loginom %s neexistuje"
+
+#: views.py:747
 msgid ""
-"New reply from %(username)s to topic that you have subscribed on.\n"
-"---\n"
-"%(message)s\n"
-"---\n"
-"See topic: %(post_url)s\n"
-"Unsubscribe %(unsubscribe_url)s"
+"Subscription removed. You will not receive emails from this topic unless you "
+"subscribe or post again."
 msgstr ""
-"Nová odpoveď od %(username)s k téme, ktorú odoberáte.\n"
-"---\n"
-"%(message)s\n"
-"---\n"
-"Pozri tému: %(post_url)s\n"
-"Neodoberať %(unsubscribe_url)s"
 
-#: views.py:199
-#, python-format
-msgid "Added after %s minute"
-msgid_plural "Added after %s minutes"
-msgstr[0] ""
-msgstr[1] ""
+#: views.py:758
+msgid ""
+"Subscription added. You will receive email notifications for replies to this "
+"topic."
+msgstr ""
 
-#: templates/pybb/add_post.html:23
-msgid "You banned"
-msgstr "Ste zablokovaný"
+#: views.py:776
+msgid "All forums marked as read"
+msgstr ""
 
-#: templates/pybb/add_post.html:27 templates/pybb/add_post.html.py:29
-#: templates/pybb/category.html:11 templates/pybb/create_pm.html:7
-#: templates/pybb/edit_post.html:21 templates/pybb/forum.html:12
-#: templates/pybb/topic.html:26
-msgid "Root"
-msgstr "Domov"
+#: views.py:809
+msgid "User successfuly blocked"
+msgstr ""
 
-#: templates/pybb/add_post.html:33 templates/pybb/add_post_form.html:9
-#: templates/pybb/forum.html:40
+#: views.py:822
+msgid "User successfuly unblocked"
+msgstr ""
+
+#: templates/pybb/_button_new_topic.html:2 templates/pybb/add_post.html:5
+#: templates/pybb/add_post.html.py:32
 msgid "New topic"
 msgstr "Nová téma"
 
-#: templates/pybb/add_post.html:33 templates/pybb/add_post_form.html:9
-msgid "New reply"
-msgstr "Nová odpoveď"
+#: templates/pybb/_button_save.html:1
+msgid "Save"
+msgstr "Uložiť"
 
-#: templates/pybb/add_post_form.html:5 templates/pybb/add_post_form.html:13
-#: templates/pybb/merge_topics.html:35
-msgid "Preview"
-msgstr "Náhľad"
-
-#: templates/pybb/add_post_form.html:12 templates/pybb/create_pm.html:14
+#: templates/pybb/_button_submit.html:1
 msgid "Submit"
 msgstr "Odoslať"
 
-#: templates/pybb/add_post_form.html:40
-msgid "Remove"
+#: templates/pybb/_markitup.html:22
+#: templates/pybb/markup/bbcode_widget.html:17
+#: templates/pybb/markup/markdown_widget.html:25
+msgid "Bold"
 msgstr ""
 
-#: templates/pybb/create_pm.html:7 templates/pybb/create_pm.html.py:12
-msgid "New private message"
-msgstr "Nová súkromná správa"
+#: templates/pybb/_markitup.html:23
+#: templates/pybb/markup/bbcode_widget.html:18
+#: templates/pybb/markup/markdown_widget.html:26
+msgid "Italic"
+msgstr ""
+
+#: templates/pybb/_markitup.html:24
+#: templates/pybb/markup/bbcode_widget.html:19
+msgid "Underline"
+msgstr ""
+
+#: templates/pybb/_markitup.html:25
+#: templates/pybb/markup/bbcode_widget.html:20
+msgid "Stroke"
+msgstr ""
+
+#: templates/pybb/_markitup.html:27
+#: templates/pybb/markup/bbcode_widget.html:22
+#: templates/pybb/markup/markdown_widget.html:33
+#, fuzzy
+msgid "Picture"
+msgstr "Podpis"
+
+#: templates/pybb/_markitup.html:28
+#: templates/pybb/markup/bbcode_widget.html:23
+#: templates/pybb/markup/markdown_widget.html:34
+msgid "Link"
+msgstr ""
+
+#: templates/pybb/_markitup.html:30
+#: templates/pybb/markup/bbcode_widget.html:25
+msgid "Bulleted list"
+msgstr ""
+
+#: templates/pybb/_markitup.html:31
+#: templates/pybb/markup/bbcode_widget.html:26
+msgid "Numeric list"
+msgstr ""
+
+#: templates/pybb/_markitup.html:32
+#: templates/pybb/markup/bbcode_widget.html:27
+msgid "List item"
+msgstr ""
+
+#: templates/pybb/_markitup.html:34
+#: templates/pybb/markup/bbcode_widget.html:29
+#: templates/pybb/markup/markdown_widget.html:36
+#, fuzzy
+msgid "Quotes"
+msgstr "citovať"
+
+#: templates/pybb/_markitup.html:35
+#: templates/pybb/markup/bbcode_widget.html:30
+msgid "Code"
+msgstr ""
+
+#: templates/pybb/_markitup.html:37
+#: templates/pybb/markup/bbcode_widget.html:32
+msgid "Clean"
+msgstr ""
+
+#: templates/pybb/_markitup.html:38
+#: templates/pybb/markup/bbcode_widget.html:33
+#: templates/pybb/markup/markdown_widget.html:39
+msgid "Preview"
+msgstr "Náhľad"
+
+#: templates/pybb/_need_to_login_message.html:3
+msgid "Register"
+msgstr ""
+
+#: templates/pybb/_need_to_login_message.html:3
+msgid "or"
+msgstr ""
+
+#: templates/pybb/_need_to_login_message.html:3
+msgid "login"
+msgstr ""
+
+#: templates/pybb/_need_to_login_message.html:3
+msgid "to create to post a reply"
+msgstr ""
+
+#: templates/pybb/add_post.html:5 templates/pybb/add_post.html.py:32
+msgid "New reply"
+msgstr "Nová odpoveď"
+
+#: templates/pybb/attachments_formset.html:6
+#, fuzzy
+msgid "Add attachments"
+msgstr "Príloha"
+
+#: templates/pybb/attachments_formset.html:12
+#: templates/pybb/edit_profile.html:27
+msgid "delete"
+msgstr "odstrániť"
+
+#: templates/pybb/breadcrumb.html:5
+msgid "Home"
+msgstr ""
 
 #: templates/pybb/delete_post.html:5
 msgid "Are you sure you want to delete this message?"
 msgstr "Ste si istý že chcete vymazať túto správu?"
 
-#: templates/pybb/delete_post.html:10
-msgid "Yes, I am sure."
+#: templates/pybb/delete_post.html:12
+msgid "No, take me back"
+msgstr ""
+
+#: templates/pybb/delete_post.html:13
+#, fuzzy
+msgid "Yes, I am sure"
 msgstr "Áno, som si istý."
 
-#: templates/pybb/edit_post.html:24 templates/pybb/edit_post.html.py:28
+#: templates/pybb/edit_post.html:4 templates/pybb/edit_post.html.py:17
 msgid "Editing the post"
 msgstr "Editácia príspevku"
 
-#: templates/pybb/edit_post.html:30 templates/pybb/edit_profile.html:30
-msgid "Save"
-msgstr "Uložiť"
-
-#: templates/pybb/edit_profile.html:20 templates/pybb/edit_profile.html:28
+#: templates/pybb/edit_profile.html:7 templates/pybb/edit_profile.html:10
+#: templates/pybb/edit_profile.html:15
 msgid "Profile editing"
 msgstr "Úprava profilu"
 
-#: templates/pybb/edit_profile.html:24
-msgid "Change the password"
-msgstr "Zmeniť heslo"
-
-#: templates/pybb/edit_profile.html:33
+#: templates/pybb/edit_profile.html:20
 msgid "Subscriptions on topics"
 msgstr "Odoberatelia na témy"
 
-#: templates/pybb/edit_profile.html:40
-msgid "delete"
-msgstr "odstrániť"
-
-#: templates/pybb/footer.html:15
-msgid "PYBB - django forum engine"
-msgstr "PYBB - django fórum"
-
-#: templates/pybb/forum.html:25
-msgid "Important"
-msgstr "Dôležité"
-
-#: templates/pybb/head.html:10 templates/pybb/head.html.py:46
-#: templates/pybb/users.html:9
-msgid "Search"
-msgstr "Hľadať"
-
-#: templates/pybb/head.html:11 templates/pybb/quick_access.html:53
-#: templates/pybb/users.html:6 templates/pybb/users.html.py:20
-msgid "Users"
-msgstr "Používatelia"
-
-#: templates/pybb/head.html:13
-msgid "My profile"
-msgstr "Môj profil"
-
-#: templates/pybb/head.html:15
-msgid "Admincp"
-msgstr "Admin"
-
-#: templates/pybb/head.html:17
-msgid "Log out"
-msgstr "Odhlásiť"
-
-#: templates/pybb/head.html:18
-msgid "Logged in as "
-msgstr "Prihlásený ako"
-
-#: templates/pybb/head.html:20
-msgid "Sign up"
-msgstr "Registrovať"
-
-#: templates/pybb/head.html:21
-msgid "Log in"
-msgstr "Prihlásiť"
-
-#: templates/pybb/head.html:47
-msgid "Search powered by Google"
-msgstr "Vyhľadávanie používa Google"
-
-#: templates/pybb/merge_topics.html:11
-msgid "Enter topic id for add to merged topics"
-msgstr "Vložte ID témy pre pridanie do zlúčených tém"
-
-#: templates/pybb/merge_topics.html:16
-msgid "Add"
-msgstr "Pridať"
-
-#: templates/pybb/merge_topics.html:24
-msgid "Choose main topic to merge"
-msgstr "Zvoľte hlavnú tému pre zlúčenie"
-
-#: templates/pybb/merge_topics.html:31
-msgid "Merge"
-msgstr "Zlúčiť"
-
-#: templates/pybb/merge_topics.html:35
-msgid "Posts from changed topics"
-msgstr "Príspevky zo zmenených tém"
-
-#: templates/pybb/merge_topics.html:36 templates/pybb/user.html:26
-msgid "Number of posts"
-msgstr "Počet príspevkov"
-
-#: templates/pybb/pagination.html:6
-msgid "Enter page number"
-msgstr "Vložte číslo strany"
-
-#: templates/pybb/pagination.html:15 templates/pybb/pagination.html.py:23
-msgid "of"
-msgstr "z"
-
-#: templates/pybb/pagination.html:21
-msgid "Go to page..."
-msgstr "Ísť na stranu..."
-
-#: templates/pybb/pagination.html:22
-#: templates/pybb/topic_mini_pagination.html:3
-msgid "Page"
-msgstr "Strana"
-
-#: templates/pybb/post_template.html:26 templates/pybb/user.html:19
-msgid "Expire"
-msgstr "Vyprší"
-
-#: templates/pybb/post_template.html:34
-msgid "Edit"
-msgstr "Upraviť"
-
-#: templates/pybb/post_template.html:39
-msgid "Delete post?"
-msgstr "Vymazať príspevok?"
-
-#: templates/pybb/post_template.html:40
-msgid "Delete"
-msgstr "Vymazať"
-
-#: templates/pybb/post_template.html:55
-msgid "Edited"
-msgstr "Upravené"
-
-#: templates/pybb/post_template.html:66
-msgid "quote"
-msgstr "citovať"
-
-#: templates/pybb/quick_access.html:16
-msgid "Last topics"
-msgstr "Najnovšie témy"
-
-#: templates/pybb/quick_access.html:17
+#: templates/pybb/forum_list.html:17
 msgid "Last posts"
 msgstr "Najnovšie príspevky"
 
-#: templates/pybb/quick_access.html:18 templates/pybb/user.html:25
-msgid "Statistics"
-msgstr "Štatistiky"
+#: templates/pybb/forum_list.html:43
+msgid "No forums created"
+msgstr ""
 
-#: templates/pybb/topic.html:48
+#: templates/pybb/forum_list.html:44
+msgid "Add forum now"
+msgstr ""
+
+#: templates/pybb/index.html:19
+msgid "Forum categories are not created"
+msgstr ""
+
+#: templates/pybb/index.html:20
+msgid "Add a category now"
+msgstr ""
+
+#: templates/pybb/index.html:25 templates/pybb/latest_topics.html:7
+#: templates/pybb/latest_topics.html:10 templates/pybb/latest_topics.html:17
+#, fuzzy
+msgid "Last updates in topics"
+msgstr "Najnovšie témy"
+
+#: templates/pybb/index.html:28
+#, fuzzy
+msgid "Mark all forums as read"
+msgstr "Označiť ako prečítané"
+
+#: templates/pybb/latest_topics.html:33
+#, fuzzy
+msgid "Mark all topics as read"
+msgstr "Označiť ako prečítané"
+
+#: templates/pybb/pagination.html:7
+msgid "previous page"
+msgstr ""
+
+#: templates/pybb/pagination.html:21
+msgid "next page"
+msgstr ""
+
+#: templates/pybb/poll.html:5
+msgid "Poll"
+msgstr ""
+
+#: templates/pybb/poll.html:37
+msgid "Cancel my poll vote"
+msgstr ""
+
+#: templates/pybb/poll_edit_form.html:7
+msgid "Poll answers"
+msgstr ""
+
+#: templates/pybb/poll_edit_form.html:20
+msgid "remove answer"
+msgstr ""
+
+#: templates/pybb/poll_edit_form.html:21
+msgid "add answer"
+msgstr ""
+
+#: templates/pybb/post_template.html:29
+msgid "Rank"
+msgstr ""
+
+#: templates/pybb/post_template.html:42 templates/pybb/user.html:49
+msgid "Edit"
+msgstr "Upraviť"
+
+#: templates/pybb/post_template.html:46
+msgid "Delete post?"
+msgstr "Vymazať príspevok?"
+
+#: templates/pybb/post_template.html:47
+msgid "Delete"
+msgstr "Vymazať"
+
+#: templates/pybb/post_template.html:49
+msgid "Approve post"
+msgstr ""
+
+#: templates/pybb/post_template.html:54 templates/pybb/topic.html:68
+#, fuzzy
+msgid "Admin"
+msgstr "Admin"
+
+#: templates/pybb/post_template.html:70
+msgid "Edited"
+msgstr "Upravené"
+
+#: templates/pybb/post_template.html:84
+msgid "quote"
+msgstr "citovať"
+
+#: templates/pybb/post_template.html:85
+#, fuzzy
+msgid "quote selected"
+msgstr "Vybrané ako:"
+
+#: templates/pybb/topic.html:57
 msgid "Unstick topic"
 msgstr "Zrušiť sledovanie témy"
 
-#: templates/pybb/topic.html:50
+#: templates/pybb/topic.html:59
 msgid "Stick topic"
 msgstr "Sledovať tému"
 
-#: templates/pybb/topic.html:54
+#: templates/pybb/topic.html:63
 msgid "Open topic"
 msgstr "Otvoriť tému"
 
-#: templates/pybb/topic.html:56
+#: templates/pybb/topic.html:65
 msgid "Close topic"
 msgstr "Zatvoriť tému"
 
-#: templates/pybb/topic.html:59
-msgid "Merge topics"
-msgstr "Zlúčiť témy"
-
-#: templates/pybb/topic.html:63
+#: templates/pybb/topic.html:76
 msgid "Unsubscribe"
 msgstr "Neodoberať"
 
-#: templates/pybb/topic.html:65
+#: templates/pybb/topic.html:78
 msgid "Subscribe"
 msgstr "Odoberať"
 
-#: templates/pybb/user.html:30
-msgid "Find all posts"
-msgstr "Nájsť všetky príspevky"
+#: templates/pybb/topic_list.html:13
+#, fuzzy
+msgid "Views"
+msgstr "Videné"
 
-#: templates/pybb/user.html:34
+#: templates/pybb/topic_list.html:16
+#, fuzzy
+msgid "Last post"
+msgstr "Najnovšie príspevky"
+
+#: templates/pybb/topic_list.html:26
+msgid "Go to first unread post"
+msgstr ""
+
+#: templates/pybb/topic_list.html:32
+#, fuzzy
+msgid "pages"
+msgstr "Správy"
+
+#: templates/pybb/user.html:18
+msgid "Statistics"
+msgstr "Štatistiky"
+
+#: templates/pybb/user.html:21
 msgid "Number of topics"
 msgstr "Počet tém"
 
-#: templates/pybb/user.html:37
-msgid "Find all topics"
-msgstr "Nájsť všetky témy"
+#: templates/pybb/user.html:27
+msgid "Number of posts"
+msgstr "Počet príspevkov"
 
-#: templates/pybb/user.html:40
+#: templates/pybb/user.html:31
 msgid "Date of registration"
 msgstr "Dátum registrácie"
 
-#: templates/pybb/user.html:41
-msgid "Contacts"
-msgstr "Kontakty"
+#: templates/pybb/user.html:39
+msgid "Block"
+msgstr ""
 
-#: templates/pybb/user_topics.html:6 templates/pybb/user_topics.html.py:11
+#: templates/pybb/user.html:40
+msgid "Block and delete all messages"
+msgstr ""
+
+#: templates/pybb/user.html:44
+msgid "Unblock"
+msgstr ""
+
+#: templates/pybb/user_posts.html:13 templates/pybb/user_posts.html.py:18
+#, fuzzy
+msgid "All posts created by"
+msgstr "Všetky témy vytvorené"
+
+#: templates/pybb/user_topics.html:13 templates/pybb/user_topics.html.py:18
 msgid "All topics created by"
 msgstr "Všetky témy vytvorené"
 
-#: templatetags/pybb_tags.py:58
+#: templates/pybb/users.html:8 templates/pybb/users.html.py:24
+msgid "Users"
+msgstr "Používatelia"
+
+#: templates/pybb/users.html:12
+msgid "Search"
+msgstr "Hľadať"
+
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+msgid "replied in topic to which you are subscribed."
+msgstr ""
+
+#: templates/pybb/mail_templates/subscription_email_body.html:5
+#, fuzzy
+msgid "Link to post:"
+msgstr "Editácia príspevku"
+
+#: templates/pybb/mail_templates/subscription_email_body.html:6
+#, fuzzy
+msgid "Link to topic:"
+msgstr "Sledovať tému"
+
+#: templates/pybb/mail_templates/subscription_email_body.html:9
+msgid ""
+"If you don't want to recive notifications on new messages in this topic "
+"visit following link:"
+msgstr ""
+
+#: templates/pybb/mail_templates/subscription_email_subject.html:2
+msgid "New answer in topic that you subscribed."
+msgstr ""
+
+#: templates/pybb/markup/bbcode_widget.html:23
+#: templates/pybb/markup/markdown_widget.html:34
+msgid "Your text to link here..."
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:18
+msgid "First Level Heading"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:18
+#: templates/pybb/markup/markdown_widget.html:19
+#: templates/pybb/markup/markdown_widget.html:20
+#: templates/pybb/markup/markdown_widget.html:21
+#: templates/pybb/markup/markdown_widget.html:22
+#: templates/pybb/markup/markdown_widget.html:23
+msgid "Your title here..."
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:19
+msgid "Second Level Heading"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:20
+msgid "Heading 3"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:21
+msgid "Heading 4"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:22
+msgid "Heading 5"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:23
+msgid "Heading 6"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:28
+msgid "Bulleted List"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:29
+msgid "Numeric List"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:37
+msgid "Code Block / Code"
+msgstr ""
+
+#: templatetags/pybb_tags.py:60
 msgid "seconds ago,seconds ago,seconds ago"
 msgstr "sekúndu pred,sekundy pred,sekúnd pred"
 
-#: templatetags/pybb_tags.py:61
+#: templatetags/pybb_tags.py:63
 msgid "seconds ago"
 msgstr "sekúnd pred"
 
-#: templatetags/pybb_tags.py:67
+#: templatetags/pybb_tags.py:69
 msgid "minutes ago,minutes ago,minutes ago"
 msgstr "minútu pred,minúty pred,minút pred"
 
-#: templatetags/pybb_tags.py:70
+#: templatetags/pybb_tags.py:72
 msgid "minutes ago"
 msgstr "minút pred"
 
-#: templatetags/pybb_tags.py:80
+#: templatetags/pybb_tags.py:82
 #, python-format
 msgid "today, %s"
 msgstr "dnes, %s"
 
-#: templatetags/pybb_tags.py:82
+#: templatetags/pybb_tags.py:84
 #, python-format
 msgid "yesterday, %s"
 msgstr "včera, %s"
 
+#~ msgid "IM"
+#~ msgstr "IM"
+
+#~ msgid "Ban options"
+#~ msgstr "Nastevanie blokovania"
+
+#~ msgid "Markup"
+#~ msgstr "Formátovaný text"
+
+#~ msgid "No"
+#~ msgstr "Nie"
+
+#~ msgid "Caution"
+#~ msgstr "Upozornenie"
+
+#~ msgid "Ban"
+#~ msgstr "Blokovanie"
+
+#~ msgid "Site"
+#~ msgstr "Stránka"
+
+#~ msgid "Jabber"
+#~ msgstr "Jabber"
+
+#~ msgid "ICQ"
+#~ msgstr "ICQ"
+
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
+#~ msgid "AIM"
+#~ msgstr "AIM"
+
+#~ msgid "Yahoo"
+#~ msgstr "Yahoo"
+
+#~ msgid "Location"
+#~ msgstr "Umiestnenie"
+
+#~ msgid "Default markup"
+#~ msgstr "Východzí markup jazyk"
+
+#~ msgid "Ban status"
+#~ msgstr "Status blokovania"
+
+#~ msgid "Ban till"
+#~ msgstr "Blokovaný do"
+
+#~ msgid "Time"
+#~ msgstr "Čas"
+
+#~ msgid "Read"
+#~ msgstr "Prečítané"
+
+#~ msgid "Reads"
+#~ msgstr "Prečítania"
+
+#~ msgid "Path"
+#~ msgstr "Cesta"
+
+#~ msgid "Hash"
+#~ msgstr "Hash"
+
+#~ msgid ""
+#~ "New reply from %(username)s to topic that you have subscribed on.\n"
+#~ "---\n"
+#~ "%(message)s\n"
+#~ "---\n"
+#~ "See topic: %(post_url)s\n"
+#~ "Unsubscribe %(unsubscribe_url)s"
+#~ msgstr ""
+#~ "Nová odpoveď od %(username)s k téme, ktorú odoberáte.\n"
+#~ "---\n"
+#~ "%(message)s\n"
+#~ "---\n"
+#~ "Pozri tému: %(post_url)s\n"
+#~ "Neodoberať %(unsubscribe_url)s"
+
+#~ msgid "You banned"
+#~ msgstr "Ste zablokovaný"
+
+#~ msgid "Root"
+#~ msgstr "Domov"
+
+#~ msgid "New private message"
+#~ msgstr "Nová súkromná správa"
+
+#~ msgid "Change the password"
+#~ msgstr "Zmeniť heslo"
+
+#~ msgid "PYBB - django forum engine"
+#~ msgstr "PYBB - django fórum"
+
+#~ msgid "Important"
+#~ msgstr "Dôležité"
+
+#~ msgid "My profile"
+#~ msgstr "Môj profil"
+
+#~ msgid "Log out"
+#~ msgstr "Odhlásiť"
+
+#~ msgid "Logged in as "
+#~ msgstr "Prihlásený ako"
+
+#~ msgid "Sign up"
+#~ msgstr "Registrovať"
+
+#~ msgid "Log in"
+#~ msgstr "Prihlásiť"
+
+#~ msgid "Search powered by Google"
+#~ msgstr "Vyhľadávanie používa Google"
+
+#~ msgid "Enter topic id for add to merged topics"
+#~ msgstr "Vložte ID témy pre pridanie do zlúčených tém"
+
+#~ msgid "Add"
+#~ msgstr "Pridať"
+
+#~ msgid "Choose main topic to merge"
+#~ msgstr "Zvoľte hlavnú tému pre zlúčenie"
+
+#~ msgid "Merge"
+#~ msgstr "Zlúčiť"
+
+#~ msgid "Posts from changed topics"
+#~ msgstr "Príspevky zo zmenených tém"
+
+#~ msgid "Enter page number"
+#~ msgstr "Vložte číslo strany"
+
+#~ msgid "of"
+#~ msgstr "z"
+
+#~ msgid "Go to page..."
+#~ msgstr "Ísť na stranu..."
+
+#~ msgid "Page"
+#~ msgstr "Strana"
+
+#~ msgid "Expire"
+#~ msgstr "Vyprší"
+
+#~ msgid "Merge topics"
+#~ msgstr "Zlúčiť témy"
+
+#~ msgid "Find all posts"
+#~ msgstr "Nájsť všetky príspevky"
+
+#~ msgid "Find all topics"
+#~ msgstr "Nájsť všetky témy"
+
+#~ msgid "Contacts"
+#~ msgstr "Kontakty"
+
 #~ msgid "Recipient"
 #~ msgstr "Príjemca"
-
-#~ msgid "User with login %s does not exist"
-#~ msgstr "Používateľ s loginom %s neexistuje"
 
 #~ msgid "You can't send PM to yourself"
 #~ msgstr "Nemôžete posielať PM sám sebe"
@@ -621,20 +1016,11 @@ msgstr "včera, %s"
 #~ msgid "All"
 #~ msgstr "Všetky"
 
-#~ msgid "None"
-#~ msgstr "Žiadne"
-
 #~ msgid "Read messages"
 #~ msgstr "Prečítané správy"
 
 #~ msgid "Unread messages"
 #~ msgstr "Neprečítané správy"
-
-#~ msgid "With selected:"
-#~ msgstr "Vybrané ako:"
-
-#~ msgid "Mark as read"
-#~ msgstr "Označiť ako prečítané"
 
 #~ msgid "Mark as unread"
 #~ msgstr "Označiť ako neprečítané"
@@ -656,9 +1042,6 @@ msgstr "včera, %s"
 
 #~ msgid "Are you sure you want to delete these messages?"
 #~ msgstr "Ste si istý, že chcete vymazať tieto správy?"
-
-#~ msgid "Messages"
-#~ msgstr "Správy"
 
 #~ msgid "From"
 #~ msgstr "Od"
