@@ -27,6 +27,7 @@ PYBB_DEFAULT_AVATAR_URL = getattr(settings, 'PYBB_DEFAULT_AVATAR_URL',
                                   getattr(settings, 'STATIC_URL', '') + 'pybb/img/default_avatar.jpg')
 
 PYBB_DEFAULT_TITLE = getattr(settings, 'PYBB_DEFAULT_TITLE', 'PYBB Powered Forum')
+PYBB_DEFAULT_FROM_EMAIL = getattr(settings, 'PYBB_DEFAULT_TITLE', getattr(settings, 'DEFAULT_FROM_EMAIL'))
 
 PYBB_SMILES_PREFIX = getattr(settings, 'PYBB_SMILES_PREFIX', 'pybb/emoticons/')
 

@@ -27,7 +27,11 @@ def notify_topic_subscribers(post):
         # Define constants for templates rendering
         delete_url = reverse('pybb:delete_subscription', args=[post.topic.id])
         current_site = Site.objects.get_current()
-        from_email = settings.DEFAULT_FROM_EMAIL
+
+        try:
+            from_email = settings.PYBB_DEFAULT_FROM_EMAIL
+        except AttributeError:
+            from_email = settings.DEFAULT_FROM_EMAIL
 
         mails = tuple()
         for user in topic.subscribers.exclude(pk=post.user.pk):
