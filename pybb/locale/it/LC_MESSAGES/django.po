@@ -338,12 +338,16 @@ msgid ""
 "Subscription removed. You will not receive emails from this topic unless you "
 "subscribe or post again."
 msgstr ""
+"Sottoscrizione rimossa. Non riceverai email da questo topic se non posterai "
+"o ti sottoscriverai di nuovo."
 
 #: views.py:758
 msgid ""
 "Subscription added. You will receive email notifications for replies to this "
 "topic."
 msgstr ""
+"Sottoscrizione aggiunta. Riceverai delle notifiche via email per le risposte "
+"a questo topic."
 
 #: views.py:776
 msgid "All forums marked as read"
