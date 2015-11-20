@@ -162,6 +162,25 @@ class LatestTopicsView(PaginatorMixin, generic.ListView):
         return qs.order_by('-updated', '-id')
 
 
+class SubscribedTopicsView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
+
+    paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
+    context_object_name = 'topic_list'
+    template_name = 'pybb/subscribed_topics.html'
+
+    def get_queryset(self):
+        qs = Topic.objects.filter(subscribers = self.request.user).select_related()
+        qs = perms.filter_topics(self.request.user, qs)
+        return qs.order_by('-updated', '-id')
+
+    def get_login_redirect_url(self):
+        return reverse('pybb:topic_subscribed')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(SubscribedTopicsView, self).dispatch(request, *args, **kwargs)
+
+
 class PybbFormsMixin(object):
 
     post_form_class = PostForm
