@@ -1,8 +1,8 @@
 {% extends 'pybb/base.html' %}
-{% load i18n pybb_tags %}
+{% load i18n pybb_tags staticfiles %}
 
 {% block title %}
-{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}
+{% if forum %}{% trans 'New topic' %}{% else %}{% trans 'New reply' %}{% endif %}
 {% endblock %}
 
 {% block extra_head %}
@@ -12,7 +12,7 @@
 {% block extra_script %}
     {{ block.super }}
     {{ form.media.js }}
-    <script type="text/javascript" src="{{ STATIC_URL }}pybb/js/jquery.formset.min.js"></script>
+    <script type="text/javascript" src="{% static 'pybb/js/jquery.formset.min.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumb %}
@@ -29,7 +29,7 @@
 
 {% block content %}
 
-<h1>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</h1>
+<h1>{% if forum %}{% trans 'New topic' %}{% else %}{% trans 'New reply' %}{% endif %}</h1>
 
 {% include "pybb/post_form.html" %}
 {% endblock content %}

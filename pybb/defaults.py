@@ -59,7 +59,7 @@ wrong_setting_warning = ('%s setting will be removed in next pybbm version. '
 bad_function_warning = '%(bad)s function is deprecated. Use %(good)s instead.'
 
 
-def getsetting_with_deprecation_check(all_settings, setting_name):
+def getsetting_with_deprecation_check(all_settings, setting_name):  # pragma: no cover
     setting_value = getattr(all_settings, setting_name)
     values = setting_value if type(setting_value) is not dict else setting_value.values()
     for value in values:
@@ -72,28 +72,26 @@ def getsetting_with_deprecation_check(all_settings, setting_name):
     return setting_value
 
 
-if not hasattr(settings, 'PYBB_MARKUP_ENGINES_PATHS'):
-    PYBB_MARKUP_ENGINES_PATHS = {'bbcode': 'pybb.markup.bbcode.BBCodeParser',
-                                 'markdown': 'pybb.markup.markdown.MarkdownParser'}
-else:
-    PYBB_MARKUP_ENGINES_PATHS = getattr(settings, 'PYBB_MARKUP_ENGINES_PATHS')
+PYBB_MARKUP_ENGINES_PATHS = getattr(settings, 'PYBB_MARKUP_ENGINES_PATHS', {
+    'bbcode': 'pybb.markup.bbcode.BBCodeParser',
+    'markdown': 'pybb.markup.markdown.MarkdownParser'})
 
 # TODO in the next major release : delete PYBB_MARKUP_ENGINES and PYBB_QUOTE_ENGINES settings
 if not hasattr(settings, 'PYBB_MARKUP_ENGINES'):
     PYBB_MARKUP_ENGINES = PYBB_MARKUP_ENGINES_PATHS
-else:
+else:  # pragma: no cover
     warnings.warn(wrong_setting_warning % 'PYBB_MARKUP_ENGINES', DeprecationWarning)
     PYBB_MARKUP_ENGINES = getsetting_with_deprecation_check(settings, 'PYBB_MARKUP_ENGINES')
 
 if not hasattr(settings, 'PYBB_QUOTE_ENGINES'):
     PYBB_QUOTE_ENGINES = PYBB_MARKUP_ENGINES_PATHS
-else:
+else:  # pragma: no cover
     warnings.warn(wrong_setting_warning % 'PYBB_QUOTE_ENGINES', DeprecationWarning)
     PYBB_QUOTE_ENGINES = getsetting_with_deprecation_check(settings, 'PYBB_QUOTE_ENGINES')
 
 PYBB_MARKUP = getattr(settings, 'PYBB_MARKUP', None)
 if not PYBB_MARKUP or PYBB_MARKUP not in PYBB_MARKUP_ENGINES:
-    if not PYBB_MARKUP_ENGINES:
+    if not PYBB_MARKUP_ENGINES:  # pragma: no cover
         warnings.warn('There is no markup engines defined in your settings. '
                       'Default pybb.base.BaseParser will be used.'
                       'Please set correct PYBB_MARKUP_ENGINES_PATHS and PYBB_MARKUP settings.',
@@ -107,6 +105,12 @@ if not PYBB_MARKUP or PYBB_MARKUP not in PYBB_MARKUP_ENGINES:
                                    'PYBB_MARKUP_ENGINES_PATHS')
 
 PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")
+PYBB_TEMPLATE_MAIL_TXT = getattr(settings, 
+                                 'PYBB_TEMPLATE_MAIL_TXT', 
+                                 'pybb/mail_templates/base.html')
+PYBB_TEMPLATE_MAIL_HTML = getattr(settings, 
+                                  'PYBB_TEMPLATE_MAIL_HTML', 
+                                  'pybb/mail_templates/base-html.html')
 PYBB_DEFAULT_AUTOSUBSCRIBE = getattr(settings, 'PYBB_DEFAULT_AUTOSUBSCRIBE', True)
 PYBB_ENABLE_ANONYMOUS_POST = getattr(settings, 'PYBB_ENABLE_ANONYMOUS_POST', False)
 PYBB_ANONYMOUS_USERNAME = getattr(settings, 'PYBB_ANONYMOUS_USERNAME', 'Anonymous')
@@ -118,7 +122,7 @@ PYBB_PREMODERATION = getattr(settings, 'PYBB_PREMODERATION', False)
 
 if not hasattr(settings, 'PYBB_BODY_CLEANERS'):
     PYBB_BODY_CLEANERS = ['pybb.markup.base.rstrip_str', 'pybb.markup.base.filter_blanks']
-else:
+else:  # pragma: no cover
     PYBB_BODY_CLEANERS = getsetting_with_deprecation_check(settings, 'PYBB_BODY_CLEANERS')
 
 PYBB_BODY_VALIDATOR = getattr(settings, 'PYBB_BODY_VALIDATOR', None)
@@ -133,12 +137,14 @@ PYBB_PERMISSION_HANDLER = getattr(settings, 'PYBB_PERMISSION_HANDLER', 'pybb.per
 
 PYBB_PROFILE_RELATED_NAME = getattr(settings, 'PYBB_PROFILE_RELATED_NAME', 'pybb_profile')
 
-PYBB_INITIAL_CUSTOM_USER_MIGRATION = getattr(settings, 'PYBB_INITIAL_CUSTOM_USER_MIGRATION', None)
+PYBB_ENABLE_ADMIN_POST_FORM = getattr(settings, 'PYBB_ENABLE_ADMIN_POST_FORM', True)
+
+PYBB_ALLOW_DELETE_OWN_POST = getattr(settings, 'PYBB_ALLOW_DELETE_OWN_POST', True)
 
 # Backward compatibility : define old functions which was defined here if some devs did used it
 # TODO in a near future : delete those functions
 
-def bbcode(s):
+def bbcode(s):  # pragma: no cover
     warnings.warn(
         bad_function_warning % {
             'bad': 'pybb.defaults.bbcode',
@@ -150,7 +156,7 @@ def bbcode(s):
     return BBCodeParser().format(s)
 
 
-def markdown(s):
+def markdown(s):  # pragma: no cover
     warnings.warn(
         bad_function_warning % {
             'bad': 'pybb.defaults.markdown',
@@ -162,7 +168,7 @@ def markdown(s):
     return MarkdownParser().format(s)
 
 
-def _render_quote(name, value, options, parent, context):
+def _render_quote(name, value, options, parent, context):  # pragma: no cover
     warnings.warn('pybb.defaults._render_quote function is deprecated. '
                   'This function is internal of new pybb.markup.bbcode.BBCodeParser class.',
                   DeprecationWarning)
@@ -171,7 +177,7 @@ def _render_quote(name, value, options, parent, context):
     return BBCodeParser()._render_quote(name, value, options, parent, context)
 
 
-def smile_it(s):
+def smile_it(s):  # pragma: no cover
     warnings.warn(
         bad_function_warning % {
             'bad': 'pybb.defaults.smile_it',

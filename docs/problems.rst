@@ -1,15 +1,9 @@
-Problems and solutions
-======================
+Known problems
+==============
 
-South fail to migrate PyBBM on first installation
--------------------------------------------------
+Using with a database that doest not support microseconds
+---------------------------------------------------------
 
-If you got problem like::
-
-    _mysql_exceptions.OperationalError: (1005, "Can't create table 'myknight.#sql-2bd_23a' (errno: 121)")
-
-you probably have mysql with innodb engine and buggy south version. Drop all pybbm related tables and run::
-
-    ./manage.py syncdb --all
-
-to directly sync tables.
+If you are using a database which does not support microseconds (MySQL before v5.7 for eg.), a
+forum can be wrongly marked read. It can happens if a user who read the only unread topic from
+a forum in the same time an other user create / update an other topic on the same forum.

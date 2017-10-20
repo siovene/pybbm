@@ -8,8 +8,8 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-from django.db.models import F, Q
-from django.forms.util import ErrorList
+from django.db.models import F
+from django.forms.utils import ErrorList
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
     HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -21,8 +21,10 @@ from django.views.decorators.csrf import csrf_protect
 from django.views import generic
 from pybb import compat, defaults, util
 from pybb.compat import get_atomic_func
-from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
-from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
+from pybb.forms import PostForm, MovePostForm, AdminPostForm, AttachmentFormSet, \
+    PollAnswerFormSet, PollForm, ForumSubscriptionForm, ModeratorForm
+from pybb.models import Category, Forum, ForumSubscription, Topic, Post, TopicReadTracker, \
+    ForumReadTracker, PollAnswerUser
 from pybb.permissions import perms
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 
@@ -124,6 +126,16 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         ctx = super(ForumView, self).get_context_data(**kwargs)
         ctx['forum'] = self.forum
+        if self.request.user.is_authenticated():
+            try:
+                ctx['subscription'] = ForumSubscription.objects.get(
+                    user=self.request.user,
+                    forum=self.forum
+                )
+            except ForumSubscription.DoesNotExist:
+                ctx['subscription'] = None
+        else:
+            ctx['subscription'] = None
         ctx['forum'].forums_accessed = perms.filter_forums(self.request.user, self.forum.child_forums.all())
         return ctx
 
@@ -149,6 +161,66 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
             return redirect(self.forum, permanent=defaults.PYBB_NICE_URL_PERMANENT_REDIRECT)
         return super(ForumView, self).get(*args, **kwargs)
 
+
+class ForumSubscriptionView(RedirectToLoginMixin, generic.FormView):
+    template_name = 'pybb/forum_subscription.html'
+    form_class = ForumSubscriptionForm
+
+    def get_login_redirect_url(self):
+        return reverse('pybb:forum_subscription', args=(self.kwargs['pk'],))
+
+    def get_success_url(self):
+        return self.forum.get_absolute_url()
+
+    def get_form_kwargs(self):
+        kw = super(ForumSubscriptionView, self).get_form_kwargs()
+        self.get_objects()
+        kw['instance'] = self.forum_subscription
+        kw['user'] = self.request.user
+        kw['forum'] = self.forum
+        return kw
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ForumSubscriptionView, self).get_context_data(**kwargs)
+        ctx['forum'] = self.forum
+        ctx['forum_subscription'] = self.forum_subscription
+        return ctx
+
+    def form_valid(self, form):
+        result = form.process()
+        if result == 'subscribe-all':
+            msg = _((
+                'You subscribed to all existant topics on this forum '
+                'and you will auto-subscribed to all its new topics.'
+            ))
+        elif result == 'delete':
+            msg = _((
+                'You won\'t be notified anymore each time a new topic '
+                'is posted on this forum.'
+            ))
+        elif result == 'delete-all':
+            msg = _((
+                'You have been subscribed to all current topics in this forum and you won\'t'
+                'be auto-subscribed anymore for each new topic posted on this forum.'
+            ))
+        else:
+            msg = _((
+                'You will be notified each time a new topic is posted on this forum.'
+            ))
+        messages.success(self.request, msg, fail_silently=True)
+        return super(ForumSubscriptionView, self).form_valid(form)
+
+    def get_objects(self):
+        if not self.request.user.is_authenticated():
+            raise PermissionDenied
+        self.forum = get_object_or_404(Forum.objects.all(), pk=self.kwargs['pk'])
+        try:
+            self.forum_subscription = ForumSubscription.objects.get(
+                user=self.request.user,
+                forum=self.forum
+            )
+        except ForumSubscription.DoesNotExist:
+            self.forum_subscription = None
 
 class LatestTopicsView(PaginatorMixin, generic.ListView):
 
@@ -210,6 +282,13 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
     template_object_name = 'post_list'
     template_name = 'pybb/topic.html'
 
+    def get(self, request, *args, **kwargs):
+        if defaults.PYBB_NICE_URL and 'pk' in kwargs:
+            return redirect(self.topic, permanent=defaults.PYBB_NICE_URL_PERMANENT_REDIRECT)
+        response = super(TopicView, self).get(request, *args, **kwargs)
+        self.mark_read()
+        return response
+
     def get_login_redirect_url(self):
         return self.topic.get_absolute_url()
 
@@ -266,13 +345,13 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         if self.request.user.is_authenticated():
             self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
-            if perms.may_post_as_admin(self.request.user):
+            if defaults.PYBB_ENABLE_ADMIN_POST_FORM and \
+                    perms.may_post_as_admin(self.request.user):
                 ctx['form'] = self.get_admin_post_form_class()(
                     initial={'login': getattr(self.request.user, username_field)},
                     topic=self.topic)
             else:
                 ctx['form'] = self.get_post_form_class()(topic=self.topic)
-            self.mark_read(self.request.user, self.topic)
         elif defaults.PYBB_ENABLE_ANONYMOUS_POST:
             ctx['form'] = self.get_post_form_class()(topic=self.topic)
         else:
@@ -281,6 +360,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         if perms.may_attach_files(self.request.user):
             aformset = self.get_attachment_formset_class()()
             ctx['aformset'] = aformset
+            ctx['attachment_max_size'] = defaults.PYBB_ATTACHMENT_SIZE_LIMIT
         if defaults.PYBB_FREEZE_FIRST_POST:
             ctx['first_post'] = self.topic.head
         else:
@@ -293,29 +373,32 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
 
         return ctx
 
-    def mark_read(self, user, topic):
+    @method_decorator(get_atomic_func())
+    def mark_read(self):
+        if not self.request.user.is_authenticated():
+            return
         try:
-            forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=user)
+            forum_mark = ForumReadTracker.objects.get(forum=self.topic.forum, user=self.request.user)
         except ForumReadTracker.DoesNotExist:
             forum_mark = None
-        if (forum_mark is None) or (forum_mark.time_stamp < topic.updated):
-            # Mark topic as readed
-            topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=topic, user=user)
-            if not new:
-                topic_mark.save()
+        if (forum_mark is None) or (forum_mark.time_stamp < self.topic.updated):
+            topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=self.topic, user=self.request.user)
+            if not new and topic_mark.time_stamp > self.topic.updated:
+                # Bail early if we already read this thread.
+                return
 
             # Check, if there are any unread topics in forum
-            readed = topic.forum.topics.filter((Q(topicreadtracker__user=user,
-                                                  topicreadtracker__time_stamp__gte=F('updated'))) |
-                                                Q(forum__forumreadtracker__user=user,
-                                                  forum__forumreadtracker__time_stamp__gte=F('updated')))\
-                                       .only('id').order_by()
+            readed_trackers = TopicReadTracker.objects.filter(
+                user=self.request.user, topic__forum=self.topic.forum, time_stamp__gte=F('topic__updated'))
+            unread = self.topic.forum.topics.exclude(topicreadtracker__in=readed_trackers)
+            if forum_mark is not None:
+                unread = unread.filter(updated__gte=forum_mark.time_stamp)
 
-            not_readed = topic.forum.topics.exclude(id__in=readed)
-            if not not_readed.exists():
-                # Clear all topic marks for this forum, mark forum as readed
-                TopicReadTracker.objects.filter(user=user, topic__forum=topic.forum).delete()
-                forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=user)
+            if not unread.exists():
+                # Clear all topic marks for this forum, mark forum as read
+                TopicReadTracker.objects.filter(user=self.request.user, topic__forum=self.topic.forum).delete()
+                forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(
+                    forum=self.topic.forum, user=self.request.user)
                 forum_mark.save()
 
     def get_topic(self, **kwargs):
@@ -333,11 +416,6 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
             raise Http404(_('This topic does not exists'))
         return topic
 
-    def get(self, *args, **kwargs):
-        if defaults.PYBB_NICE_URL and 'pk' in kwargs:
-            return redirect(self.topic, permanent=defaults.PYBB_NICE_URL_PERMANENT_REDIRECT)
-        return super(TopicView, self).get(*args, **kwargs)
-
 
 class PostEditMixin(PybbFormsMixin):
 
@@ -346,7 +424,8 @@ class PostEditMixin(PybbFormsMixin):
         return super(PostEditMixin, self).post(request, *args, **kwargs)
 
     def get_form_class(self):
-        if perms.may_post_as_admin(self.request.user):
+        if defaults.PYBB_ENABLE_ADMIN_POST_FORM and \
+                perms.may_post_as_admin(self.request.user):
             return self.get_admin_post_form_class()
         else:
             return self.get_post_form_class()
@@ -413,11 +492,14 @@ class PostEditMixin(PybbFormsMixin):
                 self.object.save()
                 if save_attachments:
                     aformset.save()
+                    if self.object.attachments.count():
+                        # re-parse the body to replace attachment's references by URLs
+                        self.object.save()
                 if save_poll_answers:
                     pollformset.save()
                 return HttpResponseRedirect(self.get_success_url())
-        return self.render_to_response(self.get_context_data(form=form, 
-                                                             aformset=aformset, 
+        return self.render_to_response(self.get_context_data(form=form,
+                                                             aformset=aformset,
                                                              pollformset=pollformset))
 
 
@@ -455,6 +537,8 @@ class AddPostView(PostEditMixin, generic.CreateView):
                     raise Http404
                 else:
                     post = get_object_or_404(Post, pk=quote_id)
+                    if not perms.may_view_post(request.user, post):
+                        raise PermissionDenied
                     profile = util.get_pybb_profile(post.user)
                     self.quote = util._get_markup_quoter(defaults.PYBB_MARKUP)(post.body, profile.get_display_name())
 
@@ -469,7 +553,8 @@ class AddPostView(PostEditMixin, generic.CreateView):
                            ip=ip, initial={}))
         if getattr(self, 'quote', None):
             form_kwargs['initial']['body'] = self.quote
-        if perms.may_post_as_admin(self.user):
+        if defaults.PYBB_ENABLE_ADMIN_POST_FORM and \
+                perms.may_post_as_admin(self.user):
             form_kwargs['initial']['login'] = getattr(self.user, username_field)
         form_kwargs['may_create_poll'] = perms.may_create_poll(self.user)
         form_kwargs['may_edit_topic_slug'] = perms.may_edit_topic_slug(self.user)
@@ -509,6 +594,43 @@ class EditPostView(PostEditMixin, generic.UpdateView):
         if not perms.may_edit_post(self.request.user, post):
             raise PermissionDenied
         return post
+
+
+class MovePostView(RedirectToLoginMixin, generic.UpdateView):
+
+    model = Post
+    form_class = MovePostForm
+    context_object_name = 'post'
+    template_name = 'pybb/move_post.html'
+
+    @method_decorator(login_required)
+    @method_decorator(csrf_protect)
+    def dispatch(self, request, *args, **kwargs):
+        return super(MovePostView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        form_kwargs = super(MovePostView, self).get_form_kwargs()
+        form_kwargs['user'] = self.request.user
+        return form_kwargs
+
+    def get_object(self, queryset=None):
+        post = super(MovePostView, self).get_object(queryset)
+        if not perms.may_moderate_topic(self.request.user, post.topic):
+            raise PermissionDenied
+        return post
+
+    def form_valid(self, *args, **kwargs):
+        from django.db.models.signals import post_save
+        from pybb.signals import topic_saved
+        # FIXME: we should have specific signals to send notifications to topic/forum subscribers
+        # but for now, we must connect / disconnect the callback
+        post_save.disconnect(topic_saved, sender=Topic)
+        response = super(MovePostView, self).form_valid(*args, **kwargs)
+        post_save.connect(topic_saved, sender=Topic)
+        return response
+
+    def get_success_url(self):
+        return self.object.topic.get_absolute_url()
 
 
 class UserView(generic.DetailView):
@@ -557,13 +679,13 @@ class UserTopics(PaginatorMixin, generic.ListView):
 
     def dispatch(self, request, *args, **kwargs):
         username = kwargs.pop('username')
-        self.user = get_object_or_404(User, username=username)
+        self.user = get_object_or_404(**{'klass': User, username_field: username})
         return super(UserTopics, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         qs = super(UserTopics, self).get_queryset()
         qs = qs.filter(user=self.user)
-        qs = perms.filter_topics(self.user, qs)
+        qs = perms.filter_topics(self.request.user, qs)
         qs = qs.order_by('-updated', '-created', '-id')
         return qs
 
@@ -642,8 +764,6 @@ class DeletePostView(generic.DeleteView):
             raise PermissionDenied
         self.topic = post.topic
         self.forum = post.topic.forum
-        if not perms.may_moderate_topic(self.request.user, self.topic):
-            raise PermissionDenied
         return post
 
     def delete(self, request, *args, **kwargs):
@@ -823,8 +943,6 @@ def block_user(request, username):
                 Forum.objects.get(id=f['topic__forum_id']).update_counters()
             except Forum.DoesNotExist:
                 pass
-
-
     msg = _('User successfuly blocked')
     messages.success(request, msg, fail_silently=True)
     return redirect('pybb:index')
@@ -841,3 +959,40 @@ def unblock_user(request, username):
     msg = _('User successfuly unblocked')
     messages.success(request, msg, fail_silently=True)
     return redirect('pybb:index')
+
+
+class UserEditPrivilegesView(generic.edit.FormMixin, generic.edit.ProcessFormView, generic.DetailView):
+
+    template_name = 'pybb/edit_privileges.html'
+    form_class = ModeratorForm
+    model = User
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_success_url(self):
+        return reverse('pybb:edit_privileges', kwargs={'username': self.object.username})
+
+    def get_initial(self):
+        initial = super(UserEditPrivilegesView, self).get_initial()
+        categories = Category.objects.all()
+        for category in categories:
+            initial['cat_%d' % category.pk] = category.forums.filter(moderators=self.object.pk)
+        return initial
+
+    def get_form_kwargs(self):
+        form_kwargs = super(UserEditPrivilegesView, self).get_form_kwargs()
+        form_kwargs['user'] = self.request.user
+        return form_kwargs
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(UserEditPrivilegesView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(UserEditPrivilegesView, self).post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.process(self.object)
+        messages.success(self.request, _("Privileges updated"))
+        return super(UserEditPrivilegesView, self).form_valid(form)

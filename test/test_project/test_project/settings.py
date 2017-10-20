@@ -1,12 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals
 import os
-import django
-try:
-    import south
-    south_installed = True
-except ImportError:
-    south_installed = False
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -24,18 +18,16 @@ if test_db == 'mysql':
     DATABASES['default'].update({
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pybbm',
-        'USER': 'root',
+        # 'USER': 'root',
         'TEST_COLLATION': 'utf8_general_ci',
     })
 elif test_db == 'postgres':
     DATABASES['default'].update({
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': 'postgres',
+        # 'USER': 'postgres',
         'NAME': 'pybbm',
         'OPTIONS': {}
     })
-    if django.VERSION[:2] < (1, 7):
-        DATABASES['default']['OPTIONS']['autocommit'] = True
 
 INSTALLED_APPS = [
     'django.contrib.auth',
@@ -43,27 +35,34 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.staticfiles',
     'test_app',
+    'pybb.apps.PybbConfig',
 ]
-if django.VERSION[:2] < (1, 7) and south_installed:
-    INSTALLED_APPS.append('south')
-
-if django.VERSION[:2] < (1, 7):
-    INSTALLED_APPS.append('pybb')
-else:
-    INSTALLED_APPS.append('pybb.apps.PybbConfig')
 
 SECRET_KEY = 'some secret'
 
-TEMPLATE_CONTEXT_PROCESSORS = [
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.static',
-    'django.core.context_processors.request',
-    'pybb.context_processors.processor',
-    'django.core.context_processors.tz'
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                # 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'pybb.context_processors.processor',
+            ],
+        },
+    },
 ]
 
 MIDDLEWARE_CLASSES = (
@@ -81,15 +80,12 @@ ROOT_URLCONF = 'test_project.urls'
 SITE_ID = 1
 
 STATIC_URL = '/static/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '..', '..', 'pybb_upload')
+MEDIA_URL = '/media/'
 
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
-)
-
-if django.VERSION[:2] > (1, 4):
-    AUTH_USER_MODEL = 'test_app.CustomUser'
+AUTH_USER_MODEL = 'test_app.CustomUser'
 
 LOGIN_URL = '/'
-
+USE_TZ = True
 PYBB_ATTACHMENT_ENABLE = True
 PYBB_PROFILE_RELATED_NAME = 'pybb_customprofile'

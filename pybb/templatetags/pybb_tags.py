@@ -11,16 +11,10 @@ from django.core.cache import cache
 from django.utils.safestring import mark_safe
 from django.utils.encoding import smart_text
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, ungettext
 from django.utils import dateformat
 from django.utils.timezone import timedelta
 from django.utils.timezone import now as tznow
-
-try:
-    import pytils
-    pytils_enabled = True
-except ImportError:
-    pytils_enabled = False
 
 from pybb.models import TopicReadTracker, ForumReadTracker, PollAnswerUser, Topic, Post
 from pybb.permissions import perms
@@ -35,10 +29,15 @@ register = template.Library()
 def pybb_time(parser, token):
     try:
         tag, context_time = token.split_contents()
-    except ValueError:
+    except ValueError: # pragma: no cover
         raise template.TemplateSyntaxError('pybb_time requires single argument')
     else:
         return PybbTimeNode(context_time)
+
+
+@register.assignment_tag(takes_context=True)
+def pybb_get_time(context, context_time):
+    return pybb_user_time(context_time, context['user'])
 
 
 class PybbTimeNode(template.Node):
@@ -48,42 +47,36 @@ class PybbTimeNode(template.Node):
 
     def render(self, context):
         context_time = self.time.resolve(context)
+        return pybb_user_time(context_time, context['user'])
 
-        delta = tznow() - context_time
-        today = tznow().replace(hour=0, minute=0, second=0)
-        yesterday = today - timedelta(days=1)
-        tomorrow = today + timedelta(days=1)
 
-        if delta.days == 0:
-            if delta.seconds < 60:
-                if pytils_enabled and context.get('LANGUAGE_CODE', '').startswith('ru'):
-                    msg = _('seconds ago,seconds ago,seconds ago')
-                    msg = pytils.numeral.choose_plural(delta.seconds, msg)
-                else:
-                    msg = _('seconds ago')
-                return '%d %s' % (delta.seconds, msg)
+def pybb_user_time(context_time, user):
+    delta = tznow() - context_time
+    today = tznow().replace(hour=0, minute=0, second=0)
+    yesterday = today - timedelta(days=1)
+    tomorrow = today + timedelta(days=1)
 
-            elif delta.seconds < 3600:
-                minutes = int(delta.seconds / 60)
-                if pytils_enabled and context.get('LANGUAGE_CODE', '').startswith('ru'):
-                    msg = _('minutes ago,minutes ago,minutes ago')
-                    msg = pytils.numeral.choose_plural(minutes, msg)
-                else:
-                    msg = _('minutes ago')
-                return '%d %s' % (minutes, msg)
-        if context['user'].is_authenticated():
-            if time.daylight:
-                tz1 = time.altzone
-            else:
-                tz1 = time.timezone
-            tz = tz1 + util.get_pybb_profile(context['user']).time_zone * 60 * 60
-            context_time = context_time + timedelta(seconds=tz)
-        if today < context_time < tomorrow:
-            return _('today, %s') % context_time.strftime('%H:%M')
-        elif yesterday < context_time < today:
-            return _('yesterday, %s') % context_time.strftime('%H:%M')
-        else:
-            return dateformat.format(context_time, 'd M, Y H:i')
+    if delta.days == 0:
+        if delta.seconds < 60:
+            msg = ungettext('%d second ago', '%d seconds ago', delta.seconds)
+            return msg % delta.seconds
+        elif delta.seconds < 3600:
+            minutes = int(delta.seconds / 60)
+            msg = ungettext('%d minute ago', '%d minutes ago', minutes)
+            return msg % minutes
+    if user.is_authenticated():
+        if time.daylight: # pragma: no cover
+            tz1 = time.altzone
+        else: # pragma: no cover
+            tz1 = time.timezone
+        tz = tz1 + util.get_pybb_profile(user).time_zone * 60 * 60
+        context_time = context_time + timedelta(seconds=tz)
+    if today < context_time < tomorrow:
+        return _('today, %s') % context_time.strftime('%H:%M')
+    elif yesterday < context_time < today:
+        return _('yesterday, %s') % context_time.strftime('%H:%M')
+    else:
+        return dateformat.format(context_time, 'd M, Y H:i')
 
 
 @register.simple_tag
@@ -99,7 +92,7 @@ def pybb_link(object, anchor=''):
 
 
 @register.filter
-def pybb_topic_moderated_by(topic, user):
+def pybb_topic_moderated_by(topic, user):  # pragma: no cover
     """
     Check if user is moderator of topic's forum.
     """
@@ -109,7 +102,7 @@ def pybb_topic_moderated_by(topic, user):
     return perms.may_moderate_topic(user, topic)
 
 @register.filter
-def pybb_editable_by(post, user):
+def pybb_editable_by(post, user):  # pragma: no cover
     """
     Check if the post could be edited by the user.
     """
@@ -207,6 +200,8 @@ def pybb_topic_inline_pagination(topic):
 
 @register.filter
 def pybb_topic_poll_not_voted(topic, user):
+    if user.is_anonymous():
+        return True
     return not PollAnswerUser.objects.filter(poll_answer__topic=topic, user=user).exists()
 
 
@@ -220,7 +215,7 @@ def pybb_get_profile(*args, **kwargs):
     try:
         return util.get_pybb_profile(kwargs.get('user') or args[0])
     except:
-        return util.get_pybb_profile_model().objects.none()
+        return None
 
 
 @register.assignment_tag(takes_context=True)
@@ -243,8 +238,8 @@ def pybb_get_latest_posts(context, cnt=5, user=None):
 
 def load_perms_filters():
     def partial(func_name, perms_obj):
-        def newfunc(user, obj):
-            return getattr(perms_obj, func_name)(user, obj)
+        def newfunc(user, obj_or_qs):
+            return getattr(perms_obj, func_name)(user, obj_or_qs)
         return newfunc
 
     def partial_no_param(func_name, perms_obj):
@@ -252,13 +247,21 @@ def load_perms_filters():
             return getattr(perms_obj, func_name)(user)
         return newfunc
 
-    for method in inspect.getmembers(perms):
-        if inspect.ismethod(method[1]) and inspect.getargspec(method[1]).args[0] == 'self' and\
-                (method[0].startswith('may') or method[0].startswith('filter')):
-            if len(inspect.getargspec(method[1]).args) == 3:
-                register.filter('%s%s' % ('pybb_', method[0]), partial(method[0], perms))
-            elif len(inspect.getargspec(method[1]).args) == 2: # only user should be passed to permission method
-                register.filter('%s%s' % ('pybb_', method[0]), partial_no_param(method[0], perms))
+    for method_name, method in inspect.getmembers(perms):
+        if not inspect.ismethod(method):
+            continue  # pragma: no cover - only methods are used to dynamically build templatetags
+        if not method_name.startswith('may') and not method_name.startswith('filter'):
+            continue  # pragma: no cover - only (may|filter)* methods are used to dynamically build templatetags
+        method_args = inspect.getargspec(method).args
+        args_count = len(method_args)
+        if args_count not in (2, 3):
+            continue  # pragma: no cover - only methods with 2 or 3 params
+        if method_args[0] != 'self' or method_args[1] != 'user':
+            continue  # pragma: no cover - only methods with self and user as first args
+        if len(inspect.getargspec(method).args) == 3:
+            register.filter('%s%s' % ('pybb_', method_name), partial(method_name, perms))
+        elif len(inspect.getargspec(method).args) == 2:
+            register.filter('%s%s' % ('pybb_', method_name), partial_no_param(method_name, perms))
 load_perms_filters()
 
 

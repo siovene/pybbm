@@ -5,13 +5,17 @@ import re
 import inspect
 
 from django import forms
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, PermissionDenied
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
+from django.utils.decorators import method_decorator
+from django.utils.text import Truncator
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.timezone import now as tznow
+from django.utils.translation import ugettext as _
 
-from pybb import compat, defaults, util
-from pybb.models import Topic, Post, Attachment, PollAnswer
+from pybb import compat, defaults, util, permissions
+from pybb.models import Topic, Post, Attachment, PollAnswer, \
+    ForumSubscription, Category, Forum, create_or_check_slug
 
 
 User = compat.get_user_model()
@@ -166,6 +170,128 @@ class PostForm(forms.ModelForm):
         return post, topic
 
 
+class MovePostForm(forms.Form):
+
+    def __init__(self, instance, user, *args, **kwargs):
+        super(MovePostForm, self).__init__(*args, **kwargs)
+        self.instance = instance
+        self.user = user
+        self.post = self.instance
+        self.category, self.forum, self.topic = self.post.get_parents()
+
+        if not self.post.is_topic_head:
+            # we do not move an entire topic but a part of it's posts. Let's select those posts.
+            self.posts_to_move = Post.objects.filter(created__gte=self.post.created,
+                                                     topic=self.topic).order_by('created', 'pk')
+            # if multiple posts exists with the same created datetime, it's important to keep the
+            # same order and do not move some posts which could be "before" our post.
+            # We can not just filter by adding `pk__gt=self.post.pk` because we could exclude
+            # some posts if for some reasons, a lesser pk has a greater "created" datetime
+            # Most of the time, we just do one extra request to be sure the first post is
+            # the wanted one
+            first_pk = self.posts_to_move.values_list('pk', flat=True)[0]
+            while first_pk != self.post.pk:
+                self.posts_to_move = self.posts_to_move.exclude(pk=first_pk)
+                first_pk = self.posts_to_move.values_list('pk', flat=True)[0]
+
+            i = 0
+            choices = []
+            for post in self.posts_to_move[1:]:  # all except the current one
+                i += 1
+                bvars = {'author': util.get_pybb_profile(post.user).get_display_name(),
+                         'abstract': Truncator(post.body_text).words(8),
+                         'i': i}
+                label = _('%(i)d (%(author)s: "%(abstract)s")') % bvars
+                choices.append((i, label))
+            choices.insert(0, (0, _('None')))
+            choices.insert(0, (-1, _('All')))
+            self.fields['number'] = forms.TypedChoiceField(
+                label=ugettext_lazy('Number of following posts to move with'),
+                choices=choices, required=True, coerce=int,
+            )
+            # we move the entire topic, so we want to change it's forum.
+            # So, let's exclude the current one
+
+        # get all forum where we can move this post (and the others)
+        move_to_forums = permissions.perms.filter_forums(self.user, Forum.objects.all())
+        if self.post.is_topic_head:
+            # we move the entire topic, so we want to change it's forum.
+            # So, let's exclude the current one
+            move_to_forums = move_to_forums.exclude(pk=self.forum.pk)
+        last_cat_pk = None
+        choices = []
+        for forum in move_to_forums.order_by('category__position', 'position', 'name'):
+            if not permissions.perms.may_create_topic(self.user, forum):
+                continue
+            if last_cat_pk != forum.category.pk:
+                last_cat_pk = forum.category.pk
+                choices.append(('%s' % forum.category, []))
+            if self.forum.pk == forum.pk:
+                name = '%(forum)s (forum of the current post)' % {'forum': self.forum}
+            else:
+                name = '%s' % forum
+            choices[-1][1].append((forum.pk, name))
+        
+        self.fields['move_to'] = forms.ChoiceField(label=ugettext_lazy('Move to forum'),
+                                                   initial=self.forum.pk,
+                                                   choices=choices, required=True,)
+        self.fields['name'] = forms.CharField(label=_('New subject'),
+                                              initial=self.topic.name,
+                                              max_length=255, required=True)
+        if permissions.perms.may_edit_topic_slug(self.user):
+            self.fields['slug'] = forms.CharField(label=_('New topic slug'),
+                                                  initial=self.topic.slug,
+                                                  max_length=255, required=False)
+
+    def get_new_topic(self):
+        if hasattr(self, '_new_topic'):
+            return self._new_topic
+        if self.post.is_topic_head:
+            topic = self.topic
+        else:
+            topic = Topic(user=self.post.user)
+
+        if topic.name != self.cleaned_data['name']:
+            topic.name = self.cleaned_data['name']
+            # force slug auto-rebuild if slug is not speficied and topic is renamed
+            topic.slug = self.cleaned_data.get('slug', None)
+        elif self.cleaned_data.get('slug', None):
+            topic.slug = self.cleaned_data['slug']
+
+        topic.forum = Forum.objects.get(pk=self.cleaned_data['move_to'])
+        topic.slug = create_or_check_slug(topic, Topic, forum=topic.forum)
+        topic.save()
+        return topic
+
+    @method_decorator(compat.get_atomic_func())
+    def save(self):
+        data = self.cleaned_data
+        topic = self.get_new_topic()
+
+        if not self.post.is_topic_head:
+            # we move some posts
+            posts = self.posts_to_move
+            if data['number'] != -1:
+                number = data['number'] + 1  # we want to move at least the current post ;-)
+                posts = posts[0:number]
+            # update posts
+            # we can not update with subqueries on same table with mysql 5.5
+            # it raises: You can't specify target table 'pybb_post' for update in FROM clause
+            # so we need to get all pks... It's bad for perfs, but posts are not often splited...
+            posts_pks = [p.pk for p in posts]
+            Post.objects.filter(pk__in=posts_pks).update(topic_id=topic.pk)
+
+        topic.update_counters()
+        topic.forum.update_counters()
+
+        if topic.pk != self.topic.pk:
+            # we just created a new topic. let's update the counters
+            self.topic.update_counters()
+        if self.forum.pk != topic.forum.pk:
+            self.forum.update_counters()
+        return Post.objects.get(pk=self.post.pk)
+
+
 class AdminPostForm(PostForm):
     """
     Superusers can post messages from any user and from any time
@@ -255,3 +381,91 @@ class PollForm(forms.Form):
             return [answers]
         else:
             return answers
+
+
+class ForumSubscriptionForm(forms.Form):
+    def __init__(self, user, forum, instance=None, *args, **kwargs):
+        super(ForumSubscriptionForm, self).__init__(*args, **kwargs)
+        self.user = user
+        self.forum = forum
+        self.instance = instance
+
+        type_choices = list(ForumSubscription.TYPE_CHOICES)
+        if instance :
+            type_choices.append(
+                ('unsubscribe', _('be unsubscribe from this forum')))
+            type_initial = instance.type
+        else:
+            type_initial = ForumSubscription.TYPE_NOTIFY
+        self.fields['type'] = forms.ChoiceField(
+            label=_('You want to'), choices=type_choices, initial=type_initial,
+            widget=forms.RadioSelect())
+
+        topic_choices = (
+            ('new', _('only new topics')),
+            ('all', _('all topics of the forum')),
+        )
+        self.fields['topics'] = forms.ChoiceField(
+            label=_('Concerned topics'), choices=topic_choices,
+            initial=topic_choices[0][0], widget=forms.RadioSelect())
+
+    def process(self):
+        """
+        saves or deletes the ForumSubscription's instance
+        """
+        action = self.cleaned_data.get('type')
+        all_topics = self.cleaned_data.get('topics') == 'all'
+        if action == 'unsubscribe':
+            self.instance.delete(all_topics=all_topics)
+            return 'delete-all' if all_topics else 'delete'
+        else:
+            if not self.instance:
+                self.instance = ForumSubscription()
+                self.instance.user = self.user
+                self.instance.forum = self.forum
+            self.instance.type = int(self.cleaned_data.get('type'))
+            self.instance.save(all_topics=all_topics)
+            return 'subscribe-all' if all_topics else 'subscribe'
+
+
+class ModeratorForm(forms.Form):
+
+    def __init__(self, user, *args, **kwargs):
+
+        """
+        Creates the form to grant moderator privileges, checking if the request user has the
+        permission to do so.
+
+        :param user: request user
+        """
+
+        super(ModeratorForm, self).__init__(*args, **kwargs)
+        categories = Category.objects.all()
+        self.authorized_forums = []
+        if not permissions.perms.may_manage_moderators(user):
+            raise PermissionDenied()
+        for category in categories:
+            forums = [forum.pk for forum in category.forums.all() if permissions.perms.may_change_forum(user, forum)]
+            if forums:
+                self.authorized_forums += forums
+                self.fields['cat_%d' % category.pk] = forms.ModelMultipleChoiceField(
+                    label=category.name,
+                    queryset=category.forums.filter(pk__in=forums),
+                    widget=forms.CheckboxSelectMultiple(),
+                    required=False
+                )
+
+    def process(self, target_user):
+        """
+        Updates the target user moderator privilesges
+
+        :param target_user: user to update
+        """
+
+        cleaned_forums = self.cleaned_data.values()
+        initial_forum_set = target_user.forum_set.all()
+        # concatenation of the lists into one
+        checked_forums = [forum for queryset in cleaned_forums for forum in queryset]
+        # keep all the forums, the request user does't have the permisssion to change
+        untouchable_forums = [forum for forum in initial_forum_set if forum.pk not in self.authorized_forums]
+        target_user.forum_set = checked_forums + untouchable_forums
