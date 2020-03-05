@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.db import models, transaction, DatabaseError
+from django.db import connection, models, transaction, DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import strip_tags
@@ -408,25 +408,27 @@ class Attachment(models.Model):
 
 class TopicReadTrackerManager(models.Manager):
     def get_or_create_tracker(self, user, topic):
-        """
-        Correctly create tracker in mysql db on default REPEATABLE READ transaction mode
-
-        It's known problem when standrard get_or_create method return can raise exception
-        with correct data in mysql database.
-        See http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django/2235624
-        """
-        is_new = True
-        sid = transaction.savepoint(using=self.db)
-        try:
-            with get_atomic_func()():
-                obj = TopicReadTracker.objects.create(user=user, topic=topic)
-            transaction.savepoint_commit(sid)
-        except DatabaseError:
-            transaction.savepoint_rollback(sid)
-            obj = TopicReadTracker.objects.get(user=user, topic=topic)
-            is_new = False
-        return obj, is_new
-
+        if 'mysql' in connection.vendor:
+            """
+            Correctly create tracker in mysql db on default REPEATABLE READ transaction mode
+    
+            It's known problem when standrard get_or_create method return can raise exception
+            with correct data in mysql database.
+            See http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django/2235624
+            """
+            is_new = True
+            sid = transaction.savepoint(using=self.db)
+            try:
+                with get_atomic_func()():
+                    obj = TopicReadTracker.objects.create(user=user, topic=topic)
+                transaction.savepoint_commit(sid)
+            except DatabaseError:
+                transaction.savepoint_rollback(sid)
+                obj = TopicReadTracker.objects.get(user=user, topic=topic)
+                is_new = False
+            return obj, is_new
+        else:
+            return self.get_or_create(user=user, topic=topic)
 
 class TopicReadTracker(models.Model):
     """
@@ -446,25 +448,27 @@ class TopicReadTracker(models.Model):
 
 class ForumReadTrackerManager(models.Manager):
     def get_or_create_tracker(self, user, forum):
-        """
-        Correctly create tracker in mysql db on default REPEATABLE READ transaction mode
-
-        It's known problem when standrard get_or_create method return can raise exception
-        with correct data in mysql database.
-        See http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django/2235624
-        """
-        is_new = True
-        sid = transaction.savepoint(using=self.db)
-        try:
-            with get_atomic_func()():
-                obj = ForumReadTracker.objects.create(user=user, forum=forum)
-            transaction.savepoint_commit(sid)
-        except DatabaseError:
-            transaction.savepoint_rollback(sid)
-            is_new = False
-            obj = ForumReadTracker.objects.get(user=user, forum=forum)
-        return obj, is_new
-
+        if 'mysql' in connection.vendor:
+            """
+            Correctly create tracker in mysql db on default REPEATABLE READ transaction mode
+    
+            It's known problem when standrard get_or_create method return can raise exception
+            with correct data in mysql database.
+            See http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django/2235624
+            """
+            is_new = True
+            sid = transaction.savepoint(using=self.db)
+            try:
+                with get_atomic_func()():
+                    obj = ForumReadTracker.objects.create(user=user, forum=forum)
+                transaction.savepoint_commit(sid)
+            except DatabaseError:
+                transaction.savepoint_rollback(sid)
+                is_new = False
+                obj = ForumReadTracker.objects.get(user=user, forum=forum)
+            return obj, is_new
+        else:
+            return self.get_or_create(user=user, forum=forum)
 
 class ForumReadTracker(models.Model):
     """
