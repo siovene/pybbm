@@ -582,6 +582,11 @@ class EditPostView(PostEditMixin, generic.UpdateView):
     @method_decorator(login_required)
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
+        post = self.get_object()
+
+        if post.created < datetime.datetime.now() - datetime.timedelta(seconds=300) and not request.user.is_superuser:
+            raise PermissionDenied
+
         return super(EditPostView, self).dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
