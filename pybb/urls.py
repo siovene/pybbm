@@ -9,7 +9,7 @@ from pybb.feeds import LastPosts, LastTopics
 from pybb.views import IndexView, CategoryView, ForumView, TopicView, \
     AddPostView, EditPostView, MovePostView, UserView, PostView, ProfileEditView, \
     DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView, \
-    OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView, \
+    OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView, SubscribedTopicsView, \
     UserTopics, UserPosts, topic_cancel_poll_vote, block_user, unblock_user, \
     delete_subscription, add_subscription, post_ajax_preview, \
     mark_all_as_read, ForumSubscriptionView, UserEditPrivilegesView
@@ -57,6 +57,7 @@ urlpatterns += [
     url('^topic/(?P<pk>\d+)/cancel_poll_vote/$', topic_cancel_poll_vote,
         name='topic_cancel_poll_vote'),
     url('^topic/latest/$', LatestTopicsView.as_view(), name='topic_latest'),
+    url('^topic/subscribed/$', SubscribedTopicsView.as_view(), name='topic_subscribed'),
 
     # Add topic/post
     url('^forum/(?P<forum_id>\d+)/topic/add/$', AddPostView.as_view(),

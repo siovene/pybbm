@@ -73,7 +73,7 @@ class PollAnswerAdmin(admin.TabularInline):
 
 class TopicAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
-    list_display = ['name', 'forum', 'created', 'head', 'post_count', 'poll_type',]
+    list_display = ['name', 'forum', 'created', 'post_count', 'poll_type',]
     list_per_page = 20
     raw_id_fields = ['user', 'subscribers']
     ordering = ['-created']

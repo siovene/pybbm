@@ -696,6 +696,22 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = self.client.get(reverse('pybb:topic_latest'))
         self.assertListEqual(list(response.context['topic_list']), [topic_2, topic_3])
 
+    def test_subscribed_topics(self):
+        topic_1 = self.topic
+        topic_1.updated = timezone.now()
+        topic_1.subscribers.add(self.user)
+        topic_1.save()
+
+        subscribed_topics_url = reverse('pybb:subscribed_topics')
+        response = self.client.get(reverse('pybb:topic_subscribed'))
+        self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % subscribed_topics_url)
+
+        self.login_client()
+        response = self.client.get(reverse('pybb:topic_subscribed'))
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(list(response.context['topic_list']), [topic_1])
+        self.client.logout()
+
     def test_hidden(self):
         client = Client()
         category = Category(name='hcat', hidden=True)

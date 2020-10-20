@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+import datetime
 import math
 
 from django.contrib.auth.decorators import login_required
@@ -235,6 +236,25 @@ class LatestTopicsView(PaginatorMixin, generic.ListView):
         qs = Topic.objects.all().select_related()
         qs = perms.filter_topics(self.request.user, qs)
         return qs.order_by('-updated', '-id')
+
+
+class SubscribedTopicsView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
+
+    paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
+    context_object_name = 'topic_list'
+    template_name = 'pybb/subscribed_topics.html'
+
+    def get_queryset(self):
+        qs = Topic.objects.filter(subscribers = self.request.user).select_related()
+        qs = perms.filter_topics(self.request.user, qs)
+        return qs.order_by('-updated', '-id')
+
+    def get_login_redirect_url(self):
+        return reverse('pybb:topic_subscribed')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(SubscribedTopicsView, self).dispatch(request, *args, **kwargs)
 
 
 class PybbFormsMixin(object):
@@ -569,6 +589,11 @@ class EditPostView(PostEditMixin, generic.UpdateView):
     @method_decorator(login_required)
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
+        post = self.get_object()
+
+        if post.created < datetime.datetime.now() - datetime.timedelta(seconds=300) and not request.user.is_superuser:
+            raise PermissionDenied
+
         return super(EditPostView, self).dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
