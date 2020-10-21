@@ -24,14 +24,15 @@ def post_saved(instance, **kwargs):
         return
 
     instance._post_saved_done = True
-    if not defaults.PYBB_DISABLE_NOTIFICATIONS:
-        notify_topic_subscribers(instance)
-
-        if util.get_pybb_profile(instance.user).autosubscribe and \
-            perms.may_subscribe_topic(instance.user, instance.topic):
-            instance.topic.subscribers.add(instance.user)
 
     if kwargs['created']:
+        if not defaults.PYBB_DISABLE_NOTIFICATIONS:
+            notify_topic_subscribers(instance)
+
+            if util.get_pybb_profile(instance.user).autosubscribe and \
+                    perms.may_subscribe_topic(instance.user, instance.topic):
+                instance.topic.subscribers.add(instance.user)
+
         profile = util.get_pybb_profile(instance.user)
         profile.post_count = instance.user.posts.count()
         profile.save()
