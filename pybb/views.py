@@ -591,7 +591,7 @@ class EditPostView(PostEditMixin, generic.UpdateView):
     def dispatch(self, request, *args, **kwargs):
         post = self.get_object()
 
-        if post.created < datetime.datetime.now() - datetime.timedelta(seconds=900) and not request.user.is_superuser:
+        if post.created < datetime.datetime.now() - datetime.timedelta(days=1) and not request.user.is_superuser:
             raise PermissionDenied
 
         return super(EditPostView, self).dispatch(request, *args, **kwargs)
