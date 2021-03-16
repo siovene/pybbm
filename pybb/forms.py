@@ -147,7 +147,7 @@ class PostForm(forms.ModelForm):
 
         allow_post = True
         if defaults.PYBB_PREMODERATION:
-            allow_post = defaults.PYBB_PREMODERATION(self.user, self.cleaned_data['body'])
+            allow_post = defaults.PYBB_PREMODERATION(self.user, self.cleaned_data['body'], self.forum)
         if self.forum:
             topic = Topic(
                 forum=self.forum,

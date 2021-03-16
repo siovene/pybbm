@@ -11,7 +11,7 @@ should return `True` if message pass filter and `False` if message require pre-m
 
 For example, next filter allow to post without pre-moderation only for superusers::
 
-    def check_superuser(user, post):
+    def check_superuser(user, post, forum):
         if user.is_superuser:
             return True
         return False
