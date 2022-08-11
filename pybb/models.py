@@ -59,7 +59,7 @@ class Forum(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='forums', verbose_name=_('Category'))
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='child_forums', verbose_name=_('Parent forum'),
                                blank=True, null=True)
-    name = models.CharField(_('Name'), max_length=80)
+    name = models.CharField(_('Name'), max_length=128)
     position = models.IntegerField(_('Position'), blank=True, default=0)
     description = models.TextField(_('Description'), blank=True)
     moderators = models.ManyToManyField(get_user_model_path(), blank=True, verbose_name=_('Moderators'))
