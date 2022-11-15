@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+
+import logging
 from django.conf import settings
+
 try:
     from django.core.urlresolvers import reverse
 except ImportError:
@@ -17,6 +20,7 @@ from pybb.models import ForumSubscription
 
 from pybb.compat import send_mass_html_mail
 
+log = logging.getLogger('apps')
 
 def notify_forum_subscribers(topic):
     forum = topic.forum
@@ -66,15 +70,24 @@ def send_notification(users, template, context=None):
     mails = []
     for user in users:
         if not getattr(util.get_pybb_profile(user), 'receive_emails', True):
+            log.debug(
+                f'pybb/send_notification: not sending notification {template} to {user.id}/{user.email}: receive_emails != True'
+            )
             continue
 
         try:
             validate_email(user.email)
         except:
             # Invalid email
+            log.debug(
+                f'pybb/send_notification: not sending notification {template} to {user.id}/{user.email}: invalid email'
+            )
             continue
 
         if user.email == '%s@example.com' % getattr(user, compat.get_username_field()):
+            log.debug(
+                f'pybb/send_notification: not sending notification {template} to {user.id}/{user.email}: example.com email'
+            )
             continue
 
         context['user'] = user
@@ -96,7 +109,14 @@ def send_notification(users, template, context=None):
             mails.append((subject, txt_message, from_email, [user.email], html_message))
 
     # Send mails
-    send_mass_html_mail(mails, fail_silently=True)
+    try:
+        send_mass_html_mail(mails, fail_silently=False)
+    except Exception as e:
+        log.warning(
+            f'pybb/send_notification: failed to send notification {template}: {str(e)}'
+        )
+    else:
+        log.info(f'pybb/send_notification: notification {template} sent to {[x[3][0] for x in mails]}')
 
     # Reactivate previous language
     translation.activate(old_lang)
