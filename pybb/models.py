@@ -188,6 +188,7 @@ class Topic(models.Model):
     updated = models.DateTimeField(_('Updated'), null=True, db_index=True)
     user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE, verbose_name=_('User'))
     views = models.IntegerField(_('Views count'), blank=True, default=0)
+    images = models.IntegerField(_('Images count'), blank=True, default=0)
     sticky = models.BooleanField(_('Sticky'), default=False)
     closed = models.BooleanField(_('Closed'), default=False)
     subscribers = models.ManyToManyField(get_user_model_path(), related_name='subscriptions',
@@ -249,6 +250,11 @@ class Topic(models.Model):
         self.forum.update_counters()
 
     def update_counters(self):
+        self.images = 0
+        img_pattern = r'\[img\].*?\[/img\]'
+        for post in self.posts.iterator():
+            self.images += len(re.findall(img_pattern, post.body, re.IGNORECASE))
+
         self.post_count = self.posts.count()
         # force cache overwrite to get the real latest updated post
         if hasattr(self, 'last_post'):
