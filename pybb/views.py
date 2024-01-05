@@ -914,7 +914,7 @@ def post_ajax_preview(request):
 
 @login_required
 def mark_all_as_read(request):
-    for forum in perms.filter_forums(request.user, Forum.objects.all()):
+    for forum in perms.filter_forums(request.user, Forum.objects.filter(topic_count__gt=0)).iterator():
         forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=forum, user=request.user)
         forum_mark.save()
     TopicReadTracker.objects.filter(user=request.user).delete()
