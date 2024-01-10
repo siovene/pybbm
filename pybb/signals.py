@@ -91,8 +91,8 @@ def get_save_slug(extra_field=None):
     return save_slug
 
 pre_save_category_slug = get_save_slug()
-pre_save_forum_slug = get_save_slug('category')
-pre_save_topic_slug = get_save_slug('forum')
+pre_save_forum_slug = get_save_slug()
+pre_save_topic_slug = get_save_slug()
 
 
 def setup():

@@ -260,7 +260,7 @@ class MovePostForm(forms.Form):
             topic.slug = self.cleaned_data['slug']
 
         topic.forum = Forum.objects.get(pk=self.cleaned_data['move_to'])
-        topic.slug = create_or_check_slug(topic, Topic, forum=topic.forum)
+        topic.slug = create_or_check_slug(topic, Topic)
         topic.save()
         return topic
 
