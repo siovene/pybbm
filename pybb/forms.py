@@ -23,6 +23,13 @@ User = compat.get_user_model()
 username_field = compat.get_username_field()
 
 
+class DynamicForumChoiceField(forms.ChoiceField):
+    def valid_value(self, value):
+        if Forum.objects.filter(pk=value).exists():
+            return True
+        return False
+
+
 class AttachmentForm(forms.ModelForm):
     class Meta(object):
         model = Attachment
@@ -181,13 +188,13 @@ class MovePostForm(forms.Form):
         self.category, self.forum, self.topic = self.post.get_parents()
 
         if not self.post.is_topic_head:
-            # we do not move an entire topic but a part of it's posts. Let's select those posts.
+            # we do not move an entire topic but part of its posts. Let's select those posts.
             self.posts_to_move = Post.objects.filter(created__gte=self.post.created,
                                                      topic=self.topic).order_by('created', 'pk')
             # if multiple posts exists with the same created datetime, it's important to keep the
             # same order and do not move some posts which could be "before" our post.
             # We can not just filter by adding `pk__gt=self.post.pk` because we could exclude
-            # some posts if for some reasons, a lesser pk has a greater "created" datetime
+            # some posts if for some reason, a lesser pk has a greater "created" datetime
             # Most of the time, we just do one extra request to be sure the first post is
             # the wanted one
             first_pk = self.posts_to_move.values_list('pk', flat=True)[0]
@@ -210,13 +217,15 @@ class MovePostForm(forms.Form):
                 label=ugettext_lazy('Number of following posts to move with'),
                 choices=choices, required=True, coerce=int,
             )
-            # we move the entire topic, so we want to change it's forum.
+            # we move the entire topic, so we want to change its forum.
             # So, let's exclude the current one
 
         # get all forum where we can move this post (and the others)
-        move_to_forums = permissions.perms.filter_forums(self.user, Forum.objects.all())
+        move_to_forums = permissions.perms.filter_forums(self.user, Forum.objects.exclude(
+            category__slug__in=['group-forums', 'equipment-forums'])
+        )
         if self.post.is_topic_head:
-            # we move the entire topic, so we want to change it's forum.
+            # we move the entire topic, so we want to change its forum.
             # So, let's exclude the current one
             move_to_forums = move_to_forums.exclude(pk=self.forum.pk)
         last_cat_pk = None
@@ -233,7 +242,7 @@ class MovePostForm(forms.Form):
                 name = '%s' % forum
             choices[-1][1].append((forum.pk, name))
         
-        self.fields['move_to'] = forms.ChoiceField(label=ugettext_lazy('Move to forum'),
+        self.fields['move_to'] = DynamicForumChoiceField(label=ugettext_lazy('Move to forum'),
                                                    initial=self.forum.pk,
                                                    choices=choices, required=True,)
         self.fields['name'] = forms.CharField(label=_('New subject'),
@@ -254,7 +263,7 @@ class MovePostForm(forms.Form):
 
         if topic.name != self.cleaned_data['name']:
             topic.name = self.cleaned_data['name']
-            # force slug auto-rebuild if slug is not speficied and topic is renamed
+            # force slug auto-rebuild if slug is not specified and topic is renamed
             topic.slug = self.cleaned_data.get('slug', None)
         elif self.cleaned_data.get('slug', None):
             topic.slug = self.cleaned_data['slug']
