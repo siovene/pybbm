@@ -201,6 +201,7 @@ class Topic(models.Model):
     poll_type = models.IntegerField(_('Poll type'), choices=POLL_TYPE_CHOICES, default=POLL_TYPE_NONE)
     poll_question = models.TextField(_('Poll question'), blank=True, null=True)
     slug = models.SlugField(verbose_name=_("Slug"), max_length=255)
+    hotness_score = models.FloatField(_('Hotness score'), default=0, db_index=True)
 
     class Meta(object):
         ordering = ['-created']
