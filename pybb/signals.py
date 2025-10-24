@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from django.db.models.signals import post_save, post_delete, pre_save
 from pybb.models import Post, Category, Topic, Forum, create_or_check_slug
 from pybb.subscription import notify_topic_subscribers, notify_forum_subscribers
@@ -34,8 +35,12 @@ def post_saved(instance, **kwargs):
                 instance.topic.subscribers.add(instance.user)
 
         profile = util.get_pybb_profile(instance.user)
-        profile.post_count = instance.user.posts.count()
-        profile.save()
+
+        def update_post_count():
+            profile.post_count = instance.user.posts.count()
+            profile.save(update_fields=['post_count'])
+
+        transaction.on_commit(update_post_count)
 
 
 def post_deleted(instance, **kwargs):
@@ -47,8 +52,11 @@ def post_deleted(instance, **kwargs):
         #When we cascade delete an user, profile and posts are also deleted
         pass
     else:
-        profile.post_count = instance.user.posts.count()
-        profile.save()
+        def update_post_count():
+            profile.post_count = instance.user.posts.count()
+            profile.save(update_fields=['post_count'])
+
+        transaction.on_commit(update_post_count)
 
 
 def user_saved(instance, created, **kwargs):
