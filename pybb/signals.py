@@ -53,8 +53,17 @@ def post_deleted(instance, **kwargs):
         pass
     else:
         def update_post_count():
-            profile.post_count = instance.user.posts.count()
-            profile.save(update_fields=['post_count'])
+            from django.db import DatabaseError
+            import logging
+            logger = logging.getLogger(__name__)
+
+            try:
+                profile.post_count = instance.user.posts.count()
+                profile.save(update_fields=['post_count'])
+            except DatabaseError as e:
+                # Profile might already be deleted (e.g., SafeDelete soft delete during cascade)
+                # or user is being deleted. This is expected in cascade deletion scenarios.
+                logger.debug("Could not update post_count for user {0}: {1}".format(instance.user.id, str(e)))
 
         transaction.on_commit(update_post_count)
 
