@@ -309,6 +309,7 @@ class Post(RenderableItem):
     updated = models.DateTimeField(_('Updated'), blank=True, null=True, db_index=True)
     user_ip = models.GenericIPAddressField(_('User IP'), blank=True, null=True, default='0.0.0.0')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
+    rejection_reason = models.CharField(_('Rejection reason'), max_length=32, null=True, blank=True)
 
     REJECTION_REASON_CHOICES = (
         ('spam', _('Spam')),
