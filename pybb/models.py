@@ -310,6 +310,23 @@ class Post(RenderableItem):
     user_ip = models.GenericIPAddressField(_('User IP'), blank=True, null=True, default='0.0.0.0')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
 
+    REJECTION_REASON_CHOICES = (
+        ('spam', _('Spam')),
+        ('scam', _('Scam / phishing')),
+        ('harassment', _('Harassment / language / tone')),
+        ('self_promotion', _('Self-promotion')),
+        ('other', _('Other')),
+    )
+
+    rejection_reason = models.CharField(
+        _('Rejection reason'),
+        max_length=32,
+        choices=REJECTION_REASON_CHOICES,
+        null=True,
+        blank=True,
+        default=None
+    )
+
     class Meta(object):
         ordering = ['created']
         verbose_name = _('Post')
