@@ -23,6 +23,17 @@ from pybb.util import unescape, FilePathGenerator, _get_markup_formatter
 from annoying.fields import AutoOneToOneField
 
 
+def get_sentinel_user():
+    from django.conf import settings
+    from django.utils.module_loading import import_string
+    getter = getattr(settings, 'PYBB_SENTINEL_USER_GETTER', None)
+    if getter:
+        return import_string(getter)()
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    return User.objects.get_or_create(username='deleted')[0]
+
+
 @python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
@@ -188,7 +199,7 @@ class Topic(models.Model):
     name = models.CharField(_('Subject'), max_length=255)
     created = models.DateTimeField(_('Created'), null=True, db_index=True)
     updated = models.DateTimeField(_('Updated'), null=True, db_index=True)
-    user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE, verbose_name=_('User'))
+    user = models.ForeignKey(get_user_model_path(), on_delete=models.SET(get_sentinel_user), verbose_name=_('User'))
     views = models.IntegerField(_('Views count'), blank=True, default=0)
     images = models.IntegerField(_('Images count'), blank=True, default=0)
     sticky = models.BooleanField(_('Sticky'), default=False)
@@ -304,11 +315,12 @@ class RenderableItem(models.Model):
 @python_2_unicode_compatible
 class Post(RenderableItem):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='posts', verbose_name=_('Topic'))
-    user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE, related_name='posts', verbose_name=_('User'))
+    user = models.ForeignKey(get_user_model_path(), on_delete=models.SET(get_sentinel_user), related_name='posts', verbose_name=_('User'))
     created = models.DateTimeField(_('Created'), blank=True, db_index=True)
     updated = models.DateTimeField(_('Updated'), blank=True, null=True, db_index=True)
     user_ip = models.GenericIPAddressField(_('User IP'), blank=True, null=True, default='0.0.0.0')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
+    rejection_reason = models.CharField(_('Rejection reason'), max_length=32, null=True, blank=True)
 
     REJECTION_REASON_CHOICES = (
         ('spam', _('Spam')),
