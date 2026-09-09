@@ -72,7 +72,7 @@ class Forum(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='forums', verbose_name=_('Category'))
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='child_forums', verbose_name=_('Parent forum'),
                                blank=True, null=True)
-    name = models.CharField(_('Name'), max_length=128)
+    name = models.CharField(_('Name'), max_length=512)
     position = models.IntegerField(_('Position'), blank=True, default=0)
     description = models.TextField(_('Description'), blank=True)
     moderators = models.ManyToManyField(get_user_model_path(), blank=True, verbose_name=_('Moderators'))
@@ -82,7 +82,7 @@ class Forum(models.Model):
     hidden = models.BooleanField(_('Hidden'), default=False)
     readed_by = models.ManyToManyField(get_user_model_path(), through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
-    slug = models.SlugField(verbose_name=_("Slug"), max_length=255)
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=512)
 
     class Meta(object):
         ordering = ['position']
@@ -575,7 +575,10 @@ def create_or_check_slug(instance, model, **extra_filters):
     :param model: needed as instance._meta.model is available since django 1.6
     :param extra_filters: filters needed for Forum and Topic for their unique_together field
     """
-    initial_slug = instance.slug or slugify(instance.name)
+    max_length = model._meta.get_field('slug').max_length
+    # A generated slug can grow during Unicode normalization. Existing and
+    # explicitly supplied slugs are URL identities; do not truncate those.
+    initial_slug = instance.slug if instance.slug else slugify(instance.name)[:max_length]
     count = -1
     last_count_len = 0
     slug_is_not_unique = True
@@ -591,7 +594,8 @@ def create_or_check_slug(instance, model, **extra_filters):
 
         if last_count_len != count_len:
             last_count_len = count_len
-            filters = {'slug__startswith': initial_slug[:(254-count_len)], }
+            prefix = initial_slug[:max_length - 1 - count_len]
+            filters = {'slug__startswith': prefix, }
             if extra_filters:
                 filters.update(extra_filters)
             objs = model.objects.filter(**filters).exclude(pk=instance.pk)
@@ -600,7 +604,7 @@ def create_or_check_slug(instance, model, **extra_filters):
         if count == 0:
             slug = initial_slug
         else:
-            slug = '%s-%d' % (initial_slug[:(254-count_len)], count)
+            slug = '%s-%d' % (prefix, count)
         slug_is_not_unique = slug in slug_list
 
     return slug
